@@ -1,0 +1,18 @@
+main.o: main.c pre_emptive_os/api/osapi.h \
+  pre_emptive_os/api/../api/general.h pre_emptive_os/api/general.h lcd.h \
+  key.h display.h game.h
+lcd.o: lcd.c pre_emptive_os/api/general.h pre_emptive_os/api/osapi.h \
+  pre_emptive_os/api/../api/general.h lcd.h ascii.h lcd_hw.h lpc2xxx.h
+lcd_hw.o: lcd_hw.c pre_emptive_os/api/osapi.h \
+  pre_emptive_os/api/../api/general.h pre_emptive_os/api/general.h \
+  lpc2xxx.h lcd_hw.h
+game.o: game.c pre_emptive_os/api/osapi.h \
+  pre_emptive_os/api/../api/general.h pre_emptive_os/api/general.h lcd.h \
+  key.h display.h pacman.h
+key.o: key.c pre_emptive_os/api/osapi.h \
+  pre_emptive_os/api/../api/general.h pre_emptive_os/api/general.h key.h \
+  lpc2xxx.h
+display.o: display.c pre_emptive_os/api/osapi.h \
+  pre_emptive_os/api/../api/general.h pre_emptive_os/api/general.h \
+  display.h lcd.h
+pacman.o: pacman.c pacman.h pre_emptive_os/api/general.h
