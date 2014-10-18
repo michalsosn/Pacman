@@ -3,6 +3,9 @@
  * Copyright:
  *    (C) 2007 Embedded Artists AB
  *
+ * Annotation:
+ *    This library has been rebuilt and adjusted to the needs of 'Pacman Project'.
+ *
  * File:
  *    pca9532.h
  *

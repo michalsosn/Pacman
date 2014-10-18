@@ -340,7 +340,7 @@ void setDirectionCallback(Direction (*updateDirection)(struct character *))
 
 void setGhostDirectionCallback(tU8 ghost, Direction (*updateDirection)(struct character *))
 {
-    if(ghost >= 0 && ghost < NUMBER_OF_GHOSTS) {
+    if(ghost < NUMBER_OF_GHOSTS) {
         ghosts[ghost].updateDirection = updateDirection;
     }
 }
