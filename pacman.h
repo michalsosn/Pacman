@@ -15,6 +15,7 @@
 #define NUMBER_OF_GHOSTS    4
 #define BOARD_WIDTH         21
 #define BOARD_HEIGHT        21
+#define INIT_TIME_TO_EAT    31
 
 /*********/
 /* Types */

@@ -12,6 +12,8 @@
 #include "key.h"
 #include "display.h"
 #include "pacman.h"
+#include "alphalcd.h"
+#include "pca9532.h"
 
 /***********/
 /* Defines */
@@ -74,7 +76,16 @@ Direction changeDirection(struct character *c) {
 
 // Called every time the player loses life.
 void lifeLostEventHandler(tU8 lives) {
-	lifeLost = 1;
+	if (lives < 3) {
+		lifeLost = 1;
+	}
+
+	int i, j;
+	for (i = 0; i < 3; ++i) {  	    // ####00####00#### <- 16 diodes show 3 lives like that
+		for (j = 0; j < 4; ++j) {   // each set of 4 diodes represents a life
+			setPca9532Pin(i * 6 + j, i < lives ? 1 : 0);
+		}
+	}
 }
 
 void gameLostEventHandler(tU8 level, tU8 score) {
@@ -144,6 +155,32 @@ void displayCharacter(Move move, tU8 animationStep) {
 	}
 }
 
+void displayScoreOnAlpha(tU8 score) {
+	char message[] = "Current score:\n               ";
+	int i = 29;
+
+	while (score > 0) {
+		message[i--] = '0' + (score % 10);
+		score /= 10;
+	}
+	while (i > 14) {
+		message[i--] = ' ';
+	}
+
+	messageOnAlpha(message, TRUE);
+}
+
+void displayTimeToEatOnI2C(tU8 remainingTime) {
+	int diodesAlight = (remainingTime + 1) * 16 / INIT_TIME_TO_EAT;  // without +1 all diodes would be off when remainingTime = 1 which would
+	int i;                                                           // mislead the player into thinking they're vulnerable again too soon
+	for (i = 16 + diodesAlight; i < 32; ++i) {
+		setPca9532Pin(i, 0);
+	}
+	for (i = 16; i < 16 + diodesAlight; ++i) {
+		setPca9532Pin(i, 1);
+	}
+}
+
 void startGame(void) {
 
 	// mark the game as active
@@ -155,7 +192,7 @@ void startGame(void) {
 	// initializes the game
 	initPacman();
 	
-	// sets the callback function reponsible for changing Pacman's direction
+	// sets the callback function responsible for changing Pacman's direction
 	setDirectionCallback(changeDirection);
 
 	// sets the handler for GameLost event
@@ -166,6 +203,12 @@ void startGame(void) {
 
 	// sets the handler for LevelComplete event
 	onLevelCompleted(levelCompletedEventHandler);
+
+	// sets the handler for ScoreChanged event
+	onScoreChanged(displayScoreOnAlpha);
+
+	// sets the handler for TimeToEatChanged event
+	onTimeToEatChanged(displayTimeToEatOnI2C);
 
 	lcdClrscr();
 	displayText("Get ready");
@@ -210,7 +253,7 @@ void startGame(void) {
 		}
 		
 		if (lifeLost == 1) {
-			displayText("You lost a life");
+			displayText("You died");
 			osSleep(150);
 		}
 		

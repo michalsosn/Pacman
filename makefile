@@ -51,13 +51,18 @@ EFLAGS  = -mthumb-interwork
 CODE    = THUMB
 
 # List C source files here.
-CSRCS   = main.c          \
-          lcd.c           \
-          lcd_hw.c        \
-          game.c         \
-          key.c           \
-          display.c 		\
-          pacman.c
+CSRCS   = main.c        \
+          lcd.c         \
+          lcd_hw.c      \
+          game.c        \
+          key.c         \
+          display.c 	\
+          pacman.c		\
+          music.c 		\
+          alphalcd.c	\
+          i2c.c			\
+          eeprom.c		\
+          pca9532.c
 
 # List assembler source files here
 ASRCS   = 

@@ -461,7 +461,7 @@ Move *makeMove()
     } else if (board[pacman.position.y][pacman.position.x] == BONUS){
         board[pacman.position.y][pacman.position.x] = EMPTY;
         score += 5;
-        ghostEatingMode = 31;
+        ghostEatingMode = INIT_TIME_TO_EAT;
         for(i = 0; i < NUMBER_OF_GHOSTS; ++i) {
             if(ghosts[i].type == GHOST) {
                 ghosts[i].type = EATABLE_GHOST;
