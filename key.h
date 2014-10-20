@@ -3,6 +3,9 @@
  * Copyright:
  *    (C) 2006 Embedded Artists AB
  *
+ * Annotation:
+ *    This library has been rebuilt and adjusted to the needs of 'Pacman Project'.
+ *
  * File:
  *    key.h
  *
@@ -31,7 +34,6 @@
 
 
 tU8 checkKey(void);
-tU8 checkKey2(void);
 
 void initKeyProc(void);
 
