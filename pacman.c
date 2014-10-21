@@ -330,6 +330,8 @@ void initPacman()
     ghosts[3].type = GHOST;
     ghosts[3].updateDirection = defaultStayAtHome;
     ghosts[3].defaultUpdateDirection = defaultGhostMovement;
+
+    if (handleLifeLost) handleLifeLost(lives);
 }
 
 void setDirectionCallback(Direction (*updateDirection)(struct character *))
