@@ -91,11 +91,13 @@ static void initializationProcess(void* arg) {
 
 	i2cInit();  // pongowcy umieścili to tutaj, przed utworzeniem procesów...
 
+	musicProcessOnce();
+	
 	osCreateProcess(gameProcess, gameStack, GAME_STACK_SIZE, &gameProcPid, 1, NULL, &gameProcError);
   	osStartProcess(gameProcPid, &gameProcError);
 
-	osCreateProcess(musicProcess, musicStack, MUSIC_STACK_SIZE, &musicProcPid, 1, NULL, &musicProcError);
-  	osStartProcess(musicProcPid, &musicProcError);
+	//osCreateProcess(musicProcess, musicStack, MUSIC_STACK_SIZE, &musicProcPid, 2, NULL, &musicProcError);
+  	//osStartProcess(musicProcPid, &musicProcError);
 
 	// releases the process control block (PCB)
 	osDeleteProcess();

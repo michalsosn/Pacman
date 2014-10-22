@@ -277,7 +277,7 @@ void initPacman()
     pacman.position.x = 10;
     pacman.position.y = 15;
     pacman.type = PACMAN;
-    pacman.updateDirection = defaultGhostMovement;
+	if (!pacman.updateDirection) pacman.updateDirection = defaultGhostMovement;
 
     ghosts[0].birthplace.x = 10;
     ghosts[0].birthplace.y = 6;

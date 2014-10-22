@@ -35,7 +35,7 @@
 /*************/
 
 // Number of ticks to wait between moves in game.
-static tU8 timeStep = 24;
+static tU8 timeStep = 18;
 
 // Registered joystick position.
 tU8 pressedKey;
@@ -81,9 +81,9 @@ void lifeLostEventHandler(tU8 lives) {
 	}
 
 	int i, j;
-	for (i = 0; i < 3; ++i) {  	    // ####00####00#### <- 16 diodes show 3 lives like that
-		for (j = 0; j < 4; ++j) {   // each set of 4 diodes represents a life
-			setPca9532Pin(i * 6 + j, i < lives ? 1 : 0);
+	for (i = 0; i < 3; ++i) {  	    // ##0##0## <- 8 diodes show 3 lives like that
+		for (j = 0; j < 2; ++j) {   // each set of 2 diodes represents a life
+			setPca9532Pin(i * 3 + j, i > 2 - lives ? 0 : 1);
 		}
 	}
 }
@@ -155,15 +155,20 @@ void displayCharacter(Move move, tU8 animationStep) {
 	}
 }
 
+void initAlpha() {
+	char message[] = "Current score:\n              0";
+	messageOnAlpha(message, TRUE);
+}
+
 void displayScoreOnAlpha(tU8 score) {
-	char message[] = "Current score:\n               ";
-	int i = 29;
+	char message[] = "\n               ";
+	int i = 16;
 
 	while (score > 0) {
 		message[i--] = '0' + (score % 10);
 		score /= 10;
 	}
-	while (i > 14) {
+	while (i > 0) {
 		message[i--] = ' ';
 	}
 
@@ -171,26 +176,23 @@ void displayScoreOnAlpha(tU8 score) {
 }
 
 void displayTimeToEatOnI2C(tU8 remainingTime) {
-	int diodesAlight = (remainingTime + 1) * 16 / INIT_TIME_TO_EAT;  // without +1 all diodes would be off when remainingTime = 1 which would
+	int diodesAlight = (remainingTime + 1) * 8 / INIT_TIME_TO_EAT;  // without +1 all diodes would be off when remainingTime = 1 which would
 	int i;                                                           // mislead the player into thinking they're vulnerable again too soon
-	for (i = 16 + diodesAlight; i < 32; ++i) {
-		setPca9532Pin(i, 0);
-	}
-	for (i = 16; i < 16 + diodesAlight; ++i) {
+	for (i = 8 + diodesAlight; i < 16; ++i) {
 		setPca9532Pin(i, 1);
+	}
+	for (i = 8; i < 8 + diodesAlight; ++i) {
+		setPca9532Pin(i, 0);
 	}
 }
 
 void startGame(void) {
-
+	
 	// mark the game as active
 	gameEnded = 0;
 
 	// default Pacman's direction at the beginning
 	direction = LEFT;
-
-	// initializes the game
-	initPacman();
 	
 	// sets the callback function responsible for changing Pacman's direction
 	setDirectionCallback(changeDirection);
@@ -210,6 +212,11 @@ void startGame(void) {
 	// sets the handler for TimeToEatChanged event
 	onTimeToEatChanged(displayTimeToEatOnI2C);
 
+	// initializes the game
+	initPacman();
+
+	initAlpha();
+	
 	lcdClrscr();
 	displayText("Get ready");
 	osSleep(150);

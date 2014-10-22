@@ -98,10 +98,14 @@ void messageOnAlpha(char *str, tU8 keepBacklight) {
 	if (initialized == 0) {
 		initLCD();
 		initialized = 1;
+		
+		//display clear
+		writeLCD(0, 0x01);
+		osSleep(1); //actually only 1.52 mS needed
 	}
 
 	lcdBacklight(TRUE);
-	osSleep(50);
+	//osSleep(50);
 
 	//function set
 	writeLCD(0, 0x30);
@@ -119,9 +123,6 @@ void messageOnAlpha(char *str, tU8 keepBacklight) {
 	writeLCD(0, 0x08);
 	delay37us();
 
-	//display clear
-	writeLCD(0, 0x01);
-	osSleep(1); //actually only 1.52 mS needed
 
 	//display control set
 	writeLCD(0, 0x06);
@@ -144,6 +145,6 @@ void messageOnAlpha(char *str, tU8 keepBacklight) {
 		delay37us();
 	}
 
-	osSleep(50);
+	//osSleep(50);
 	lcdBacklight(keepBacklight);
 }
