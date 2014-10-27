@@ -1,6 +1,6 @@
 /***********************************************
  *          EMBEDDED SYSTEMS
- * 
+ *
  * Project: Pacman
  * Device: LPC2148v3 + Expansion Board
  *
@@ -30,6 +30,7 @@
 #include "music.h"
 #include "i2c.h"
 #include "pca9532.h"
+#include "bluetooth.h"
 
 /***********/
 /* Defines */
@@ -74,7 +75,7 @@ int main(void) {
   osInit();
   osCreateProcess(initializationProcess, initStack, INIT_STACK_SIZE, &initProcPid, 1, NULL, &initProcError);
   osStartProcess(initProcPid, &initProcError);
-  
+
   // starts the operating system
   // before calling this function at least one process must be created and started
   osStart();
@@ -92,7 +93,7 @@ static void initializationProcess(void* arg) {
 	i2cInit();  // pongowcy umieścili to tutaj, przed utworzeniem procesów...
 
 	musicProcessOnce();
-	
+
 	osCreateProcess(gameProcess, gameStack, GAME_STACK_SIZE, &gameProcPid, 1, NULL, &gameProcError);
   	osStartProcess(gameProcPid, &gameProcError);
 
@@ -114,8 +115,9 @@ static void gameProcess(void* arg) {
 	lcdContrast(LCD_CONTRAST);
 	// initializes joystick
 	initKeyProc();
-	
+
 	pca9532Init();
+    initBluetooth();
 
 	displayMenu();
 

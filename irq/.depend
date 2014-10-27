@@ -1,0 +1,5 @@
+irq_timer1.o: irq_timer1.c ../../pre_emptive_os/api/general.h \
+  ../../startup/lpc2xxx.h
+irqUart.o: irqUart.c ../../pre_emptive_os/api/general.h \
+  ../../startup/lpc2xxx.h irqUart.h ../uart.h \
+  ../../pre_emptive_os/api/general.h

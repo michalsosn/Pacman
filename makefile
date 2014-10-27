@@ -62,7 +62,9 @@ CSRCS   = main.c        \
           alphalcd.c	\
           i2c.c			\
           eeprom.c		\
-          pca9532.c
+          pca9532.c		\
+		  uart.c		\
+		  bluetooth.c
 
 # List assembler source files here
 ASRCS   = 
@@ -72,7 +74,8 @@ SUBDIRS = startup
 
 # List additional libraries to link with
 LIBS    = startup/libea_startup_thumb.a \
-		  pre_emptive_os/pre_emptive_os.a
+		  pre_emptive_os/pre_emptive_os.a \
+		  irq/irq_code.a
 
 # Add include search paths
 INC     = -I ./startup
