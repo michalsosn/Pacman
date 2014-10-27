@@ -14,6 +14,7 @@
 #include "pacman.h"
 #include "alphalcd.h"
 #include "pca9532.h"
+#include "rgbled.h"
 
 /***********/
 /* Defines */
@@ -177,13 +178,32 @@ void displayScoreOnAlpha(tU8 score) {
 
 void displayTimeToEatOnI2C(tU8 remainingTime) {
 	int diodesAlight = (remainingTime + 1) * 8 / INIT_TIME_TO_EAT;  // without +1 all diodes would be off when remainingTime = 1 which would
-	int i;                                                           // mislead the player into thinking they're vulnerable again too soon
+	int i;                                                          // mislead the player into thinking they're vulnerable again too soon
 	for (i = 8 + diodesAlight; i < 16; ++i) {
 		setPca9532Pin(i, 1);
 	}
 	for (i = 8; i < 8 + diodesAlight; ++i) {
 		setPca9532Pin(i, 0);
 	}
+}
+
+void displayTomeToEatOnRGBLed(tU8 remainingTime) { // niebieski -> błękitny -> zielony -> żółty -> czerwony
+    if (remainingTime == 0) {
+	    setRGBLedColor(255, 0, 0);
+	} else if (remainingTime == INIT_TIME_TO_EAT / 4) {
+	    setRGBLedColor(255, 255, 0);
+	} else if (remainingTime == INIT_TIME_TO_EAT / 2) {
+	    setRGBLedColor(0, 255, 0);
+	} else if (remainingTime == INIT_TIME_TO_EAT * 3 / 4) {
+	    setRGBLedColor(0, 255, 255);
+	} else if (remainingTime == INIT_TIME_TO_EAT) {
+	    setRGBLedColor(0, 0, 255);
+	}
+}
+
+void displayTimeToEat(tU8 remainingTime){
+    displayTimeToEatOnI2C(remainingTime);
+	displayTomeToEatOnRGBLed(remainingTime);
 }
 
 void startGame(void) {
@@ -210,7 +230,7 @@ void startGame(void) {
 	onScoreChanged(displayScoreOnAlpha);
 
 	// sets the handler for TimeToEatChanged event
-	onTimeToEatChanged(displayTimeToEatOnI2C);
+	onTimeToEatChanged(displayTimeToEat);
 
 	// initializes the game
 	initPacman();
