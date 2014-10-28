@@ -31,6 +31,7 @@
 #include "i2c.h"
 #include "pca9532.h"
 #include "bluetooth.h"
+#include "startup/ea_init.h"
 
 /***********/
 /* Defines */
@@ -90,6 +91,7 @@ static void initializationProcess(void* arg) {
 	tU8 gameProcPid, gameProcError;
 	tU8 musicProcPid, musicProcError;
 
+	eaInit();
 	i2cInit();  // pongowcy umieścili to tutaj, przed utworzeniem procesów...
 
 	musicProcessOnce();

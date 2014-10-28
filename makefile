@@ -64,7 +64,8 @@ CSRCS   = main.c        \
           eeprom.c		\
           pca9532.c		\
 		  uart.c		\
-		  bluetooth.c
+		  bluetooth.c   \
+		  rgbled.c
 
 # List assembler source files here
 ASRCS   = 

@@ -63,7 +63,7 @@
 
 /* define consol settings */
 #define CONSOL_UART              0
-#define CONSOL_BITRATE      115200
+#define CONSOL_BITRATE       115200
 /*#define USE_UART_FIFO             FALSE  */      /* Will be added in a future release */
 /*#define UART_API_NONBLOCKING      FALSE  */      /* Will be added in a future release */
 /*#define UART_API_NONBLOCKING_SIZE   512  */      /* Will be added in a future release */

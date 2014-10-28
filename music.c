@@ -36,7 +36,7 @@ void musicProcess(void* arg) {
 				(1 << 16);         	   // BIAS = 1, 2.5uS settling time
 
 		
-	    for (j = 0; j < 850; j++) {    // delay 125 us = 850 for 8kHz, 600 for 11 kHz
+	    for (j = 0; j < 600; j++) {    // delay 125 us = 850 for 8kHz, 600 for 11 kHz
 	    	asm volatile (" nop");
 	    }
 
@@ -59,7 +59,7 @@ void musicProcessOnce(void) {
 				(1 << 16);         	   // BIAS = 1, 2.5uS settling time
 
 		
-	    for (j = 0; j < 850; j++) {    // delay 125 us = 850 for 8kHz, 600 for 11 kHz
+	    for (j = 0; j < 600; j++) {    // delay 125 us = 850 for 8kHz, 600 for 11 kHz
 	    	asm volatile (" nop");
 	    }
 

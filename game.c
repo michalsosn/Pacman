@@ -203,7 +203,7 @@ void displayTomeToEatOnRGBLed(tU8 remainingTime) { // niebieski -> błękitny ->
 
 void displayTimeToEat(tU8 remainingTime){
     displayTimeToEatOnI2C(remainingTime);
-	displayTomeToEatOnRGBLed(remainingTime);
+	//displayTomeToEatOnRGBLed(remainingTime);
 }
 
 void startGame(void) {
