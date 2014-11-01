@@ -92,9 +92,9 @@ static void initializationProcess(void* arg) {
 	tU8 musicProcPid, musicProcError;
 
 	eaInit();
-	i2cInit();  // pongowcy umieścili to tutaj, przed utworzeniem procesów...
+	i2cInit();
 
-	musicProcessOnce();
+	// musicProcessOnce();
 
 	osCreateProcess(gameProcess, gameStack, GAME_STACK_SIZE, &gameProcPid, 1, NULL, &gameProcError);
   	osStartProcess(gameProcPid, &gameProcError);
@@ -119,7 +119,7 @@ static void gameProcess(void* arg) {
 	initKeyProc();
 
 	pca9532Init();
-    initBluetooth();
+    initBluetoothMode2();
 
 	displayMenu();
 

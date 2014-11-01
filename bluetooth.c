@@ -6,39 +6,155 @@
 #include "alphalcd.h"
 #include "startup/printf_P.h"
 
-void initBluetooth(void) {
-    initUart1(B9600(CORE_FREQ / PBSD), UART_8N1, UART_FIFO_8);
+void initBluetoothMode2(void) {
+
+	printf("Inicjalizuje Bluetooth\n");
+
+    initUart1Mode2(B38400(CORE_FREQ / PBSD), UART_8N1, UART_FIFO_8);
+
+    printf("Zainicjalizowano UART1\n");
+
 	osSleep(50);
+
+	// reset modem settings
+	// IODIR0 |= 0x00008000;
+	// IOSET0  = 0x00008000;
+	// IOCLR0  = 0x00008000;
+	// osSleep(2);
+	// IOSET0  = 0x00008000;
+
+	// indicate Request To Send and Data Terminal Ready
+	// IODIR0 |= 0x00000400;  //P0.10-RTS output
+	// IOCLR0  = 0x00000400;
+	// IODIR0 |= 0x00002000;  //P0.13-DTR output
+	// IOSET0  = 0x00002000;
 	
+	// osSleep(25);
+
+	printf("Wysylam sekwencje +++\n");
+
 	uart1SendString("+++");
-	osSleep(50);
+	osSleep(5);
 
 	tU8 currentChar;
 	tU8 done = 0;
 	
-	char buffer[2];
-	buffer[1] = 0;
+	char buffer[10];
+	buffer[9] = 0;
 	
-	printf("Dane z UART1\n");
-	while (done < 2) {
+	printf("Dane z UART1:\n");
+
+	tU8 pos = 0;
+	tBool ok = FALSE;
+	while (ok == FALSE) {
 		currentChar = uart1GetCh();
 		printf("%c", currentChar);
-		buffer[0] = currentChar;
+		buffer[pos] = currentChar;
+
 		messageOnAlpha(buffer, TRUE);
-		osSleep(100);
-		
-		if (currentChar == 'O') {
-			done = 1;
-		} else if (currentChar == 'K') {
-			done = 2;
+		osSleep(20);
+
+		if (buffer[pos] == 'K') {
+			tU8 temp = (pos == 0 ? 8 : pos - 1);
+			if (buffer[temp] == 'O') {
+				ok = TRUE;
+			}
 		}
+
+		++pos;
+		if (pos > 8) {
+			pos = 0;
+		}		
 	}
 	
-    uart1SendString("\r\n+STWMOD=0\r\n");
+	printf("Ustawiam tryb Slave\n");
+
+    uart1SendString("\n+STWMOD=0\n");
 	osSleep(100);
+
+	printf("Zezwalam na odpytywanie\n");
 	
-    //uart1SendString("\r\n+STNA=pacman");
-	//uart1SendString("\r\n+STBD=9600\r\n");
-    //uart1SendString("\r\n+STPIN=1234\r\n");
-	uart1SendString("\r\n+INQ=1\r\n");
+    //uart1SendString("\n+STNA=pacman\n");
+	//uart1SendString("\n+STBD=9600\n");
+    //uart1SendString("\n+STPIN=1234\n");
+	uart1SendString("\n+INQ=1\n");
+
+	printf("Zakonczylem inicjalizacje\n");
+}
+
+
+void initBluetooth(void) {
+
+	printf("Inicjalizuje Bluetooth\n");
+
+    initUart1(B38400(CORE_FREQ / PBSD), UART_8N1, UART_FIFO_8);
+
+    printf("Zainicjalizowano UART1\n");
+
+	osSleep(50);
+
+	// reset modem settings
+	IODIR0 |= 0x00008000;
+	IOSET0  = 0x00008000;
+	IOCLR0  = 0x00008000;
+	osSleep(2);
+	IOSET0  = 0x00008000;
+
+	// indicate Request To Send and Data Terminal Ready
+	IODIR0 |= 0x00000400;  //P0.10-RTS output
+	IOCLR0  = 0x00000400;
+	IODIR0 |= 0x00002000;  //P0.13-DTR output
+	IOSET0  = 0x00002000;
+	
+	osSleep(25);
+
+	printf("Wysylam sekwencje +++\n");
+
+	uart1SendString("+++");
+	osSleep(20);
+
+	tU8 currentChar;
+	tU8 done = 0;
+	
+	char buffer[10];
+	buffer[9] = 0;
+	
+	printf("Dane z UART1:\n");
+
+	tU8 pos = 0;
+	tBool ok = FALSE;
+	while (ok == FALSE) {
+		currentChar = uart1GetCh();
+		printf("%c", currentChar);
+		buffer[pos] = currentChar;
+
+		messageOnAlpha(buffer, TRUE);
+		osSleep(20);
+
+		if (buffer[pos] == 'K') {
+			tU8 temp = (pos == 0 ? 8 : pos - 1);
+			if (buffer[temp] == 'O') {
+				ok = TRUE;
+			}
+		}
+
+		++pos;
+		if (pos > 8) {
+			pos = 0;
+		}		
+	}
+	
+	printf("Ustawiam tryb Slave\n");
+
+    uart1SendString("\n+STWMOD=0\n");
+	osSleep(100);
+
+	printf("Zezwalam na odpytywanie\n");
+	
+    //uart1SendString("\n+STNA=pacman\n");
+	//uart1SendString("\n+STBD=9600\n");
+    //uart1SendString("\n+STPIN=1234\n");
+	uart1SendString("\n+INQ=1\n");
+
+	printf("Zakonczylem inicjalizacje\n");
 }

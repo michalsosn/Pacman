@@ -15,11 +15,11 @@
  * Defines, macros, and typedefs
  *****************************************************************************/
 
-#define FOSC 14745000                 /* External clock input frequency (must be between 10 MHz and 25 MHz) */
+#define FOSC 12000000                 /* External clock input frequency (must be between 10 MHz and 25 MHz) */
 
 #define USE_PLL 1                     /* 0 = do not use on-chip PLL,
                                          1 = use on-chip PLL) */
-#define PLL_MUL 4                     /* PLL multiplication factor (1 to 32) */
+#define PLL_MUL 5                     /* PLL multiplication factor (1 to 32) */
 #define PLL_DIV 2                     /* PLL division factor (1, 2, 4, or 8) */
 #define PBSD    1                     /* Peripheral bus speed divider (1, 2, or 4) */
 
@@ -38,7 +38,7 @@
 #define MAM_TIMING   3                /* number of CCLK to read from the FLASH */
 #endif
 
-#define MAM_SETTING  0                /* 0=disabled,
+#define MAM_SETTING  2                /* 0=disabled,
                                          1=partly enabled (enabled for code prefetch, but not for data),
                                          2=fully enabled */
 
@@ -58,12 +58,12 @@
 #define stackSize_SVC     64
 #define stackSize_UND     64
 #define stackSize_ABT     64
-#define stackSize_IRQ    700
+#define stackSize_IRQ   2048
 #define stackSize_FIQ     64
 
 /* define consol settings */
 #define CONSOL_UART              0
-#define CONSOL_BITRATE       115200
+#define CONSOL_BITRATE       38400
 /*#define USE_UART_FIFO             FALSE  */      /* Will be added in a future release */
 /*#define UART_API_NONBLOCKING      FALSE  */      /* Will be added in a future release */
 /*#define UART_API_NONBLOCKING_SIZE   512  */      /* Will be added in a future release */

@@ -43,7 +43,7 @@
 #define UFCR_FIFO_TRIG1  0x00
 #define UFCR_FIFO_TRIG4  0x40
 #define UFCR_FIFO_TRIG8  0x80
-#define UFCR_FIFO_TRIG16 0xc0
+#define UFCR_FIFO_TRIG14 0xc0
 
 //define for determning the correct uart clock division factor
 //Note that the expressions should always be constants and fully evaluated at
