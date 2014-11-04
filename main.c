@@ -119,7 +119,7 @@ static void gameProcess(void* arg) {
 	initKeyProc();
 
 	pca9532Init();
-    initBluetoothMode2();
+    initBluetooth();
 
 	displayMenu();
 

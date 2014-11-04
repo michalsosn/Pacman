@@ -10,7 +10,7 @@ void initBluetoothMode2(void) {
 
 	printf("Inicjalizuje Bluetooth\n");
 
-    initUart1Mode2(B38400(CORE_FREQ / PBSD), UART_8N1, UART_FIFO_8);
+    initUart1Mode2(B9600(CORE_FREQ / PBSD), UART_8N1, UART_FIFO_8);
 
     printf("Zainicjalizowano UART1\n");
 
@@ -85,13 +85,15 @@ void initBluetoothMode2(void) {
 
 void initBluetooth(void) {
 
+	printf("\n --------------------------------------------------- \n\n");
+
 	printf("Inicjalizuje Bluetooth\n");
 
     initUart1(B38400(CORE_FREQ / PBSD), UART_8N1, UART_FIFO_8);
 
     printf("Zainicjalizowano UART1\n");
 
-	osSleep(50);
+	osSleep(5);
 
 	// reset modem settings
 	IODIR0 |= 0x00008000;
@@ -144,17 +146,54 @@ void initBluetooth(void) {
 		}		
 	}
 	
-	printf("Ustawiam tryb Slave\n");
+	printf("\nUstawiam tryb Slave/Master\n");
 
     uart1SendString("\n+STWMOD=0\n");
-	osSleep(100);
-
-	printf("Zezwalam na odpytywanie\n");
+	osSleep(200);
 	
-    //uart1SendString("\n+STNA=pacman\n");
+	tU8 znak;
+	tU8 current;
+	for (znak = 0; znak < 60; ++znak) {
+		current = uart1GetCh();
+		printf("%c", current);
+	}
+	printf("\n");
+	
+	osSleep(200);
+	
+	printf("Zmieniam nazwe\n");
+    uart1SendString("\n+STNA=pacman\n");
+	for (znak = 0; znak < 60; ++znak) {
+		current = uart1GetCh();
+		printf("%c", current);
+	}
+	printf("\n");
+	
+	osSleep(200);
+	
+	uart1SendString("\n+STPIN=1234\n");
+	osSleep(200);
+	
+	printf("Zezwalam na odpytywanie\n");
+	//uart1SendString("\n+STBD=9600\n");
+	uart1SendString("\n+INQ=1\n");
+	for (znak = 0; znak < 60; ++znak) {
+		current = uart1GetCh();
+		printf("%c", current);
+	}	
+	printf("\n");
+	
+	osSleep(200);
+	
+	printf("Probuje sie polaczyc\n");
 	//uart1SendString("\n+STBD=9600\n");
     //uart1SendString("\n+STPIN=1234\n");
-	uart1SendString("\n+INQ=1\n");
+	uart1SendString("\n+CONN=50,FC,9F,5F,B8,3B\n");
+	for (znak = 0; znak < 60; ++znak) {
+		current = uart1GetCh();
+		printf("%c", current);
+	}	
+	printf("\n");
 
 	printf("Zakonczylem inicjalizacje\n");
 }
