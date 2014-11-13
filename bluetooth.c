@@ -188,12 +188,21 @@ void initBluetooth(void) {
 	printf("Probuje sie polaczyc\n");
 	//uart1SendString("\n+STBD=9600\n");
     //uart1SendString("\n+STPIN=1234\n");
-	uart1SendString("\n+CONN=50,FC,9F,5F,B8,3B\n");
+	uart1SendString("\n+CONN=30,39,26,3B,B7,A3\n");
 	for (znak = 0; znak < 60; ++znak) {
 		current = uart1GetCh();
 		printf("%c", current);
 	}	
 	printf("\n");
-
+	
 	printf("Zakonczylem inicjalizacje\n");
+}
+
+inline void sendDataThroughBluetooth() {
+	//uart1SendString("Testowo przesyłam kilka linii danych/n")
+	int i;
+	for(i = 0; i < 20; ++i) {
+		uart1SendString("Wysyłam testową linię danych/n");
+		osSleep(50);
+	}
 }
