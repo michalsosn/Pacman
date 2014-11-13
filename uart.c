@@ -40,67 +40,6 @@ volatile tU32 uart1RxTail = 0;
 /*****************************************************************************
  *
  * Description:
- *    Initialize UART #1 in irq.
- *
- * Parameters:
- *    [in] div_factor - UART clock division factor to get desired bit rate.
- *                      Use definitions in uart.h to calculate correct value.
- *    [in] mode       - transmission format settings. Use constants in uart.h
- *    [in] fifo_mode  - FIFO control settings. Use constants in uart.h
- *
- ****************************************************************************/
-void
-initUart1Mode2(tU16 div_factor, tU8 mode, tU8 fifo_mode)
-{
-  volatile tU32 dummy;
-  
-  //initialize the receive semaphore
-  // osSemInit(&receiveSem, 0);
-
-  //enable uart #1 pins in GPIO (P0.8  = TxD1, P0.9  = RxD1)
-  //                            (P0.10 = RTS1, P0.11 = CTS1)
-  PINSEL0 = (PINSEL0 & 0xff00ffff) | 0x00550000;
-
-  U1IER = 0x00;                        //disable all uart interrupts
-  dummy = U1IIR;                       //clear all pending interrupts
-  dummy = U1RBR;                       //clear receive register
-  dummy = U1LSR;                       //clear line status register
-
-  //set the bit rate = set uart clock (pclk) divisionfactor
-  U1LCR = 0x80;                        //enable divisor latches (DLAB bit set, bit 7)
-  U1DLL = (tU8)div_factor;             //write division factor LSB
-  U1DLM = (tU8)(div_factor >> 8);      //write division factor MSB
-
-  //set transmissiion and fifo mode
-  U1LCR = (mode & ~0x80);              //DLAB bit (bit 7) must be reset
-  U1FCR = fifo_mode;
-
-  //initialize the interrupt vector
-  VICIntSelect &= ~0x00000080;      // UART1 selected as IRQ
-  VICVectCntl7  =  0x00000027;
-  VICVectAddr7  =  (tU32)uart1ISR;  // address of the ISR
-  VICIntEnable |=  0x00000080;      // UART1 interrupt enabled
-
-  //initialize the transmit data queue
-  uart1TxHead    = 0;
-  uart1TxTail    = 0;
-  uart1TxRunning = FALSE;
-
-  //initialize the receive data queue
-  uart1RxHead   = 0;
-  uart1RxTail   = 0;
-  // uart1RxInBuff = 0;
-
-  //set RTS high (= accept received bytes)
-  U1MCR = 0x02;
-
-  //enable receiver interrupts
-  U1IER = 0x0d; //0x01;  //incl. modem
-}
-
-/*****************************************************************************
- *
- * Description:
  *    Initialize UART #1 in polled mode, i.e., interrupts are not used.
  *
  * Parameters:

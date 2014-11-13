@@ -1,13 +1,5 @@
-/******************************************
- *      API for Bluetooth module          *
- ******************************************/
+#define MAX_ANSWER_BUFFER	250
 
-/*
- * Initialize Bluetooth module via UART1.
- */
 void initBluetooth(void);
 
-/*
- * Sends 
- */
-void sendDataThroughBluetooth();
+void sendDataThroughBluetooth(char *text);

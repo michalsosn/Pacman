@@ -120,7 +120,6 @@ static void gameProcess(void* arg) {
 
 	pca9532Init();
     initBluetooth();
-	sendDataThroughBluetooth();
 
 	displayMenu();
 

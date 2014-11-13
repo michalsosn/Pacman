@@ -4,3 +4,10 @@
 *.elf
 
 *.swp
+
+.cproject
+.depend
+.project
+pacman.map
+startup/.depend
+startup/libea_startup_thumb.a
