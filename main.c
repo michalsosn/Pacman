@@ -119,8 +119,6 @@ static void gameProcess(void* arg) {
 	initKeyProc();
 
 	pca9532Init();
-    initBluetooth();
-
 	displayMenu();
 
 	while (1) {
@@ -128,7 +126,7 @@ static void gameProcess(void* arg) {
 
 		if (keyPressed == KEY_CENTER) {
 			startGame();
-			displayMenu();
+			return;
 		}
 
 		osSleep(20);

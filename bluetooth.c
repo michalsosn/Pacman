@@ -39,6 +39,14 @@ tBool waitForAnswer(char *expectedAnswer, tU8 answerLength, tU8 maxLength) {
 }
 
 void sendDataThroughBluetooth(char *text) {
+	if (waitForAnswer("BTSTATE:4", 9, 250)) {
+		printf("\nOtrzymalem BTSTATE:4\n");
+		waitForAnswer("result", 6, 250);
+		printf("\nOtrzymalem prosbe o wynik gry\n");
+	} else {
+		printf("\nNIE otrzymalem BTSTATE:4\n");
+	}
+
 	printf("\nProbuje wyslac: %s\n", text);
 	uart1SendString(text);
 	printf("\nTekst zostal przeslany\n");
@@ -82,8 +90,6 @@ void initBluetooth(void) {
 	waitForAnswer("STAUTO", 6, 240);
 	waitForAnswer("OK", 2, 240);
 	
-	//osSleep(200);
-	
 	printf("\nUstawiam tryb Slave/Master\n");
 
     uart1SendString("\n+STWMOD=0\n");
@@ -91,10 +97,6 @@ void initBluetooth(void) {
 
 	waitForAnswer("STWMOD", 6, 240);
 	waitForAnswer("OK", 2, 240);
-	
-	// osSleep(100);
-	
-	// osSleep(200);
 	
 	printf("\nZmieniam nazwe\n");
     uart1SendString("\n+STNA=pacman\n");
@@ -105,26 +107,11 @@ void initBluetooth(void) {
 	
 	osSleep(100);
 	
-	//uart1SendString("\n+STPIN=1234\n");
-	//osSleep(200);
-	//uart1SendString("\n+STBD=9600\n");
-	
 	printf("Zezwalam na odpytywanie\n");
 	uart1SendString("\n+INQ=1\n");
 	printf("\nWyslalem INQ\n");
 
 	waitForAnswer("OK", 2, 240);
 	
-	// osSleep(200);
-
-	if (waitForAnswer("BTSTATE:4", 9, 250)) {
-		printf("\nOtrzymalem BTSTATE:4\n");
-		waitForAnswer("RESULT", 6, 250);
-		printf("\nOtrzymalem prosbe o wynik gry\n");
-		sendDataThroughBluetooth("Gratulacje, wygrales!");
-	} else {
-		printf("\nNIE otrzymalem BTSTATE:4\n");
-	}
-	
-	printf("\nZakonczylem komunikacje\n");
+	printf("\nZakonczylem inicjalizacje\n");
 }

@@ -15,6 +15,7 @@
 #include "alphalcd.h"
 #include "pca9532.h"
 #include "rgbled.h"
+#include "bluetooth.h"
 
 /***********/
 /* Defines */
@@ -47,8 +48,11 @@ Direction direction;
 // A flag indicating if the game is still active.
 tU8 gameEnded;
 
-// A flag indicating if the player lost a life;
+// A flag indicating if the player lost a life.
 tU8 lifeLost;
+
+// Current player's score.
+tU8 currentScore;
 
 /*************/
 /* Functions */
@@ -162,6 +166,8 @@ void initAlpha() {
 }
 
 void displayScoreOnAlpha(tU8 score) {
+	currentScore = score;
+
 	char message[] = "\n               ";
 	int i = 16;
 
@@ -188,6 +194,12 @@ void displayTimeToEatOnI2C(tU8 remainingTime) {
 }
 
 void displayTomeToEatOnRGBLed(tU8 remainingTime) { // niebieski -> błękitny -> zielony -> żółty -> czerwony
+	char rt[4];
+	rt[0] = '0' + remainingTime / 10;
+	rt[1] = '0' + remainingTime % 10;
+	rt[2] = ' ';
+	rt[3] = 0;
+	messageOnAlpha(rt, TRUE);
     if (remainingTime == 0) {
 	    setRGBLedColor(255, 0, 0);
 	} else if (remainingTime == INIT_TIME_TO_EAT / 4) {
@@ -203,7 +215,7 @@ void displayTomeToEatOnRGBLed(tU8 remainingTime) { // niebieski -> błękitny ->
 
 void displayTimeToEat(tU8 remainingTime){
     displayTimeToEatOnI2C(remainingTime);
-	//displayTomeToEatOnRGBLed(remainingTime);
+	displayTomeToEatOnRGBLed(remainingTime);
 }
 
 void startGame(void) {
@@ -286,10 +298,24 @@ void startGame(void) {
 		
 	} while (!gameEnded);
 	
+
+	char message[] = "SCORE:    ";
+	int i = 9;
+	while (currentScore > 0) {
+		message[i] = '0' + (currentScore % 10);
+		--i;
+		currentScore /= 10;
+	}
+
 	if (gameEnded == GAME_LOST) {
 		displayText("Game lost");
 	} else {
 		displayText("You won");
 	}
 	osSleep(150);
+
+	displayText("Init Bluetooth");
+	initBluetooth();
+	displayText("Send \"result\"");
+	sendDataThroughBluetooth(message);
 }
