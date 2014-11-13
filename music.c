@@ -1,13 +1,9 @@
 #include "pre_emptive_os/api/general.h"
-#include <lpc2xxx.h>
+#include "lpc2xxx.h"
 #include "music.h"
+#include "startup/config.h"
 
 #define MUSIC ((t&4096)?((t*(t^t%255)|(t>>4))>>1):(t>>3)|((t&8192)?t<<2:t))
-
-#define FOSC 14745600                 /* External clock input frequency (must be between 10 MHz and 25 MHz) */
-#define PLL_MUL 4                     /* PLL multiplication factor (1 to 32) */
-#define CORE_FREQ (FOSC * PLL_MUL)
-
 
 void set_delay(unsigned int delayInUs) {
   T0TCR = 0x02;          //stop and reset timer
