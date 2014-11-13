@@ -65,6 +65,7 @@ CSRCS   = main.c        \
           pca9532.c		\
 		  uart.c		\
 		  bluetooth.c   \
+		  adc.c 		\
 		  rgbled.c
 
 # List assembler source files here

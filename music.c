@@ -18,53 +18,27 @@ void set_delay(unsigned int delayInUs) {
   T0TCR = 0x01;          //start timer
 }
 
-void wait() {
-  while (T0TCR & 0x01);
-}
-
-void musicProcess(void* arg) {
+void playMusic(void) {
+	int repetitions = 3;
     int t, j;
 
 	//Initialize DAC: AOUT = P0.25
 	PINSEL1 &= ~0x000C0000;
 	PINSEL1 |=  0x00080000;
 
-	for (t = 0; t <= 2000000000; ++t) {
-		//set_delay(125);
+	while (repetitions > 0) {
+		--repetitions;
+		for (t = 0; t <= 20000; ++t) {
 
-		DACR = ((MUSIC & 255) << 6) |  // actual value to output
-				(1 << 16);         	   // BIAS = 1, 2.5uS settling time
+			DACR = ((MUSIC & 255) << 6) |  // actual value to output
+					(1 << 16);         	   // BIAS = 1, 2.5uS settling time
 
-		
-	    for (j = 0; j < 600; j++) {    // delay 125 us = 850 for 8kHz, 600 for 11 kHz
-	    	asm volatile (" nop");
-	    }
+			
+		    for (j = 0; j < 600; j++) {    // delay 125 us = 850 for 8kHz, 600 for 11 kHz
+		    	asm volatile (" nop");
+		    }
 
-	    //wait();
+		}
 	}
-
-	osDeleteProcess();
-}
-void musicProcessOnce(void) {
-    int t, j;
-
-	//Initialize DAC: AOUT = P0.25
-	PINSEL1 &= ~0x000C0000;
-	PINSEL1 |=  0x00080000;
-
-	for (t = 0; t <= 20000; ++t) {
-		//set_delay(125);
-
-		DACR = ((MUSIC & 255) << 6) |  // actual value to output
-				(1 << 16);         	   // BIAS = 1, 2.5uS settling time
-
-		
-	    for (j = 0; j < 600; j++) {    // delay 125 us = 850 for 8kHz, 600 for 11 kHz
-	    	asm volatile (" nop");
-	    }
-
-	    //wait();
-	}
-
 }
 

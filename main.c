@@ -27,7 +27,6 @@
 #include "key.h"
 #include "display.h"
 #include "game.h"
-#include "music.h"
 #include "i2c.h"
 #include "pca9532.h"
 #include "bluetooth.h"
@@ -40,7 +39,6 @@
 // stack size for processes:
 #define INIT_STACK_SIZE  	400
 #define GAME_STACK_SIZE    1200
-#define MUSIC_STACK_SIZE    128
 
  // LCD contrast value
  #define LCD_CONTRAST		 50
@@ -52,7 +50,6 @@
 // stacks for processes
 static tU8 initStack[INIT_STACK_SIZE];
 static tU8 gameStack[GAME_STACK_SIZE];
-static tU8 musicStack[MUSIC_STACK_SIZE];
 
 /*************/
 /* Functions */
@@ -89,7 +86,6 @@ int main(void) {
 //   [in] arg - parameters passed to the function (not used)
 static void initializationProcess(void* arg) {
 	tU8 gameProcPid, gameProcError;
-	tU8 musicProcPid, musicProcError;
 
 	eaInit();
 	i2cInit();
@@ -99,10 +95,6 @@ static void initializationProcess(void* arg) {
 	osCreateProcess(gameProcess, gameStack, GAME_STACK_SIZE, &gameProcPid, 1, NULL, &gameProcError);
   	osStartProcess(gameProcPid, &gameProcError);
 
-	//osCreateProcess(musicProcess, musicStack, MUSIC_STACK_SIZE, &musicProcPid, 2, NULL, &musicProcError);
-  	//osStartProcess(musicProcPid, &musicProcError);
-
-	// releases the process control block (PCB)
 	osDeleteProcess();
 }
 
@@ -126,7 +118,7 @@ static void gameProcess(void* arg) {
 
 		if (keyPressed == KEY_CENTER) {
 			startGame();
-			return;
+			break;
 		}
 
 		osSleep(20);

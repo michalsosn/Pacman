@@ -13,6 +13,8 @@ tS8 eepromPageRead(tU16 address,
 
 tS8 eepromPoll(void);
 
+tS8 lm75Read(tU8 address, tU8* pBuf, tU16 len);
+
 tS8 pca9532(tU8* pBuf, tU16 len, tU8* pBuf2, tU16 len2);
 
 #endif

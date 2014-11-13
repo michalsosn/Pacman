@@ -15,6 +15,8 @@
 #include "alphalcd.h"
 #include "pca9532.h"
 #include "rgbled.h"
+#include "music.h"
+#include "adc.h"
 #include "bluetooth.h"
 
 /***********/
@@ -57,6 +59,29 @@ tU8 currentScore;
 /*************/
 /* Functions */
 /*************/
+
+void changeGameSpeed() {
+	tU16 temperature = getTemperature();
+	timeStep = 6 * (31 - temperature);
+	if (timeStep == 0) {
+		timeStep = 6;
+	}
+
+	switch (timeStep) {
+		case 6:
+			setRGBLedColor(255, 0, 0);
+			break;
+		case 12:
+			setRGBLedColor(255, 255, 0);
+			break;
+		case 18:
+			setRGBLedColor(0, 255, 0);
+			break;
+		default:
+			setRGBLedColor(0, 0, 255);
+			break;
+	}
+}
 
 // Changes direction of Pacman's moves.
 Direction changeDirection(struct character *c) {
@@ -215,7 +240,7 @@ void displayTomeToEatOnRGBLed(tU8 remainingTime) { // niebieski -> błękitny ->
 
 void displayTimeToEat(tU8 remainingTime){
     displayTimeToEatOnI2C(remainingTime);
-	displayTomeToEatOnRGBLed(remainingTime);
+	//displayTomeToEatOnRGBLed(remainingTime);
 }
 
 void startGame(void) {
@@ -274,6 +299,9 @@ void startGame(void) {
 		// Let all characters make a move.
 		moves = makeMove();
 
+		// Adjusts game's speed to the temperature.
+		changeGameSpeed();
+
 		// Display characters in movement.
 		// Each move is split into steps to make it smoother.
 		int animationStep;
@@ -312,7 +340,8 @@ void startGame(void) {
 	} else {
 		displayText("You won");
 	}
-	osSleep(150);
+	
+	playMusic();
 
 	displayText("Init Bluetooth");
 	initBluetooth();
