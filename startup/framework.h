@@ -3,20 +3,31 @@
  * Copyright:
  *    (C) 2000 - 2005 Embedded Artists AB
  *
+ * Annotation:
+ *    This library has been adjusted to the needs of 'Pacman Project'.
+ *
+ * File:
+ *    framework.h
+ * 
  * Description:
  *    Framework for ARM7 processor
  *
  *****************************************************************************/
 
-
 #ifndef _framework_h_
 #define _framework_h_
 
+/************/
+/* Includes */
+/************/
+
 #include "config.h"
 
-//
-//check that PLL values are within valid ranges
-//
+/***********/
+/* Defines */
+/***********/
+
+// check that PLL values are within valid ranges
 #if (USE_PLL == 1)
 
 #if PLL_MUL > 32
@@ -35,14 +46,14 @@
 
 #define CCLK (FOSC * PLL_MUL)          //CPU core clock frequency
 
-//check if CCLK is within valid range
+// check if CCLK is within valid range
 #if ((CCLK < 10000000) || (CCLK > 60000000))
 #error CCLK is out of range (valid range is: 10MHz-60MHz)
 #endif
 
 #define FCCO (FOSC * PLL_MUL * 2 * PLL_DIV)      //CC Osc. Freq.
 
-//check if FCCO is within valid range
+// check if FCCO is within valid range
 #if ((FCCO < 156000000) || (FCCO > 320000000))
 #error FCCO is out of range (valid range is: 156MHz-320MHz)
 #endif
@@ -58,10 +69,6 @@
 #error PBSD must be 1, 2, or 4
 #endif
 #define PCLK (CCLK / PBSD)           //Peripheral bus clock frequency
-
-/******************************************************************************
- * Defines
- *****************************************************************************/
 
 /* Addresses of the instruction that is executed after an exception
    (when vectors are in RAM) */
@@ -83,16 +90,18 @@
 #define pISR_IRQ       (*(unsigned int *)(SRAM_SADDR + 0x34))
 #define pISR_FIQ       (*(unsigned int *)(SRAM_SADDR + 0x38))
 
-/******************************************************************************
- * External variables
- *****************************************************************************/
+/*************/
+/* Variables */
+/*************/
+
 //Pointers that define the available heap
 extern unsigned char *pHeapStart;
 extern unsigned char *pHeapEnd;
 
-/******************************************************************************
- * Public functions
- *****************************************************************************/
+/*************/
+/* Functions */
+/*************/
+
 void lowLevelInit(void);
 void eaInit(void);
 

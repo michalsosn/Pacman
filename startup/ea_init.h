@@ -1,18 +1,18 @@
 /******************************************************************************
-*
-* Copyright:
-*    (C) 2000-2005 Embedded Artists AB
-*
-* Description:
-*     Initialization API for the LPC2106 Evaluation Board.
-*
-* Version:
-*     1.0.0
-*
-* NOTE:
-*
-*
-******************************************************************************/
+ *
+ * Copyright:
+ *    (C) 2000-2005 Embedded Artists AB
+ *
+ * Annotation:
+ *    This library has been adjusted to the needs of 'Pacman Project'.
+ *
+ * File:
+ *    ea_init.h
+ * 
+ * Description:
+ *     Initialization API for the LPC2148 Board.
+ *
+ ******************************************************************************/
 
 #ifndef _EA_INIT_H_
 #define _EA_INIT_H_
@@ -36,11 +36,11 @@
                                          )
 
 /******************************************************************************
-*
-* Description:
-*     Initializes the evaluation board environment
-* 
-*******************************************************************************/
-extern void eaInit (void);
+ *
+ * Description:
+ *     Initializes the evaluation board environment
+ * 
+ *******************************************************************************/
+extern void eaInit(void);
 
 #endif
