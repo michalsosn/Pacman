@@ -278,14 +278,16 @@ void eaInit(void) {
 
 int putchar(int ch) { /* Write character to Serial Port    */
 
-    if (ch == '\n')
+    if (ch == '\n') {
         consolSendChar(0x0d); /* output CR */
+    }
     consolSendChar(ch);
     return 1;
 }
 
 int getchar(void) { /* Read character from Serial Port */
-    while (!(UART_LSR & 0x01));
+    while (!(UART_LSR & 0x01))
+        ;
     return UART_RBR;
 }
 ///////////////////
@@ -335,8 +337,9 @@ int isatty(int fd) {
 #endif
 
 int _kill_r(struct _reent *ptr, int pid, int sig) {
-    if (pid == 1)
+    if (pid == 1) {
         _exit_r(sig);
+    }
     return 0;
 }
 
@@ -350,15 +353,19 @@ int _open_r(struct _reent *ptr, const char *buf, int flags, int mode) {
 
 int _write_r(struct _reent *ptr, int fd, const char *buf, int nbytes) {
     int i;
-    for (i = 0; i < nbytes; i++) putchar(*buf++);
+    for (i = 0; i < nbytes; i++) {
+        putchar(*buf);
+        ++buf;
+    }
     return nbytes;
 }
 
 void print(char *ptr) {
     char *p = ptr;
 
-    while (*p != '\0')
+    while ('\0' != *p) {
         p++;
+    }
 
     _write_r(0, 1, ptr, p - ptr);
 }
@@ -373,8 +380,11 @@ int _read_r(struct _reent *ptr, int fd, char *buf, int nbytes) {
 
     for (i = 0; i < nbytes; i++) {
         c = getchar();
-        if (c == 0x0D) break;
-        *buf++ = c;
+        if (0x0D == c) {
+            break;
+        }
+        *buf = c;
+        ++buf;
         putchar(c);
     }
     return nbytes - i;
@@ -386,15 +396,18 @@ char *heap_ptr;
 char * _sbrk_r(struct _reent *ptr, int nbytes) {
     char *base;
 
-    if (!heap_ptr) // if it is the very first time for memory allocation.
+    if (!heap_ptr) {
+        // if it is the very first time for memory allocation.
         //	   heap_ptr = (char *)&_heap_begin;      // the begining of the heap memory.
         heap_ptr = pHeapStart;
+    }
 
     base = heap_ptr;
     heap_ptr += nbytes;
     //    if ( heap_ptr >= ( char *) &_heap_end )
-    if (heap_ptr >= pHeapEnd)
+    if (heap_ptr >= pHeapEnd) {
         _exit_r(666); // out of heap memory!!!
+    }
     return base;
 }
 
