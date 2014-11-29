@@ -3,50 +3,51 @@
  * Copyright:
  *    (C) 2000 - 2005 Embedded Artists AB
  *
+ * Annotation:
+ *    This library has been adjusted to meet the needs of 'Pacman Project'.
+ *
+ * File:
+ *    consol.h
+ *
  * Description:
  *    Framework specific implementation of consol
  *
  *****************************************************************************/
 
-
 #ifndef _consol_h_
 #define _consol_h_
 
-/******************************************************************************
- * Includes
- *****************************************************************************/
+/***********/
+/* Defines */
+/***********/
 
-/******************************************************************************
- * Defines, macros, and typedefs
- *****************************************************************************/
 #if CONSOL_UART == 0
-#define UART_RBR UART0_RBR     //RO - Receiver Buffer
-#define UART_THR UART0_THR     //WO - Transmit Holding
-#define UART_IER UART0_IER     //RW - Interrupt Enable
-#define UART_IIR UART0_IIR     //RO - Interrupt ID
-#define UART_FCR UART0_FCR     //WO - FIFO Control
-#define UART_LCR UART0_LCR     //RW - Line Control
-#define UART_LSR UART0_LSR     //RO - Line Status
-#define UART_SCR UART0_SCR     //RW - Scratch Pad
-#define UART_DLL UART0_DLL     //RW - Divisor Latch LSB (DLAB = 1)
-#define UART_DLM UART0_DLM     //RW - Divisor Latch MSB (DLAB = 1)
+#define UART_RBR UART0_RBR     // RO - Receiver Buffer
+#define UART_THR UART0_THR     // WO - Transmit Holding
+#define UART_IER UART0_IER     // RW - Interrupt Enable
+#define UART_IIR UART0_IIR     // RO - Interrupt ID
+#define UART_FCR UART0_FCR     // WO - FIFO Control
+#define UART_LCR UART0_LCR     // RW - Line Control
+#define UART_LSR UART0_LSR     // RO - Line Status
+#define UART_SCR UART0_SCR     // RW - Scratch Pad
+#define UART_DLL UART0_DLL     // RW - Divisor Latch LSB (DLAB = 1)
+#define UART_DLM UART0_DLM     // RW - Divisor Latch MSB (DLAB = 1)
 #else
-#define UART_RBR UART1_RBR     //RO - Receiver Buffer
-#define UART_THR UART1_THR     //WO - Transmit Holding
-#define UART_IER UART1_IER     //RW - Interrupt Enable
-#define UART_IIR UART1_IIR     //RO - Interrupt ID
-#define UART_FCR UART1_FCR     //WO - FIFO Control
-#define UART_LCR UART1_LCR     //RW - Line Control
-#define UART_LSR UART1_LSR     //RO - Line Status
-#define UART_SCR UART1_SCR     //RW - Scratch Pad
-#define UART_DLL UART1_DLL     //RW - Divisor Latch LSB (DLAB = 1)
-#define UART_DLM UART1_DLM     //RW - Divisor Latch MSB (DLAB = 1)
+#define UART_RBR UART1_RBR     // RO - Receiver Buffer
+#define UART_THR UART1_THR     // WO - Transmit Holding
+#define UART_IER UART1_IER     // RW - Interrupt Enable
+#define UART_IIR UART1_IIR     // RO - Interrupt ID
+#define UART_FCR UART1_FCR     // WO - FIFO Control
+#define UART_LCR UART1_LCR     // RW - Line Control
+#define UART_LSR UART1_LSR     // RO - Line Status
+#define UART_SCR UART1_SCR     // RW - Scratch Pad
+#define UART_DLL UART1_DLL     // RW - Divisor Latch LSB (DLAB = 1)
+#define UART_DLM UART1_DLM     // RW - Divisor Latch MSB (DLAB = 1)
 #endif
 
-/******************************************************************************
- * Public functions
- *****************************************************************************/
-
+/*************/
+/* Functions */
+/*************/
 
 /*****************************************************************************
  *
@@ -118,7 +119,7 @@ void consolSendNumber(unsigned char base,
                       int           number);
 
 
-#if (CONSOLE_API_PRINTF == 1)  //OWN_PRINTF
+#if (CONSOLE_API_PRINTF == 1)  // OWN_PRINTF
 /*****************************************************************************
  *
  * Description:
@@ -133,7 +134,7 @@ void simplePrintf(const char * fmt,
                   ...          );
 #endif
 
-#if (CONSOLE_API_SCANF == 1)  //SIMPLE
+#if (CONSOLE_API_SCANF == 1)  // SIMPLE
 
 /*****************************************************************************
  *

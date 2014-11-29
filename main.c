@@ -58,11 +58,17 @@ static tU8 gameStack[GAME_STACK_SIZE];
 static void initializationProcess(void *arg);
 static void gameProcess(void *arg);
 
-/*
- * The first function to be executed.
- * Creates the initialization process and then starts the OS.
- * Initialization process is executed with the highest priority to make sure no other processes start before it ends.
- */
+/*****************************************************************************
+*
+* Description:
+*    The first function to be executed.
+*    Creates the initialization process and then starts the OS.
+*    Initialization process is executed with the highest priority to make sure no other processes start before it ends.
+*
+* Returns:
+*    int - Program exit code
+*
+ ****************************************************************************/
 int main(void) {
 
   tU8 initProcError;
@@ -79,12 +85,15 @@ int main(void) {
   return 0;
 }
 
-/*
- * Initialization process is responsible for creating application processes.
+/*****************************************************************************
  *
- * Parameters:
- *   arg - parameters passed to the function (not used)
- */
+ * Description:
+ *    Initialization process is responsible for creating application processes.
+ *
+ * Params:
+ *    [in] arg - parameters passed to the function (not used)
+ *
+ ****************************************************************************/
 static void initializationProcess(void *arg) {
 	tU8 gameProcPid, gameProcError;
 
@@ -99,12 +108,15 @@ static void initializationProcess(void *arg) {
 	osDeleteProcess();
 }
 
-/*
- * Process reponsible for starting and running the game.
+/*****************************************************************************
  *
- * Parameters:
- *   arg - parameters passed to the function (not used)
- */
+ * Description:
+ *    Process reponsible for starting and running the game.
+ *
+ * Params:
+ *    [in] arg - parameters passed to the function (not used)
+ *
+ ****************************************************************************/
 static void gameProcess(void *arg) {
 
 	// Initializes LCD
@@ -134,12 +146,15 @@ static void gameProcess(void *arg) {
 	osDeleteProcess();
 }
 
-/*
- * This function is called once for each timer tick interrupt in OS.
- * It should be kept as short as possible because it runs in interrupt context.
+/****************************************************************************
  *
- * Parameters:
- *   elapsedTime - Number of elapsed milliseconds since the last call of this function.
- */
+ * Description:
+ *    This function is called once for each timer tick interrupt in OS.
+ *    It should be kept as short as possible because it runs in interrupt context.
+ *
+ * Params:
+ *    [in] elapsedTime - Number of elapsed milliseconds since the last call of this function.
+ *
+ ****************************************************************************/
 void appTick(tU32 elapsedTime) {
 }

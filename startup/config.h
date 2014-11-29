@@ -3,17 +3,23 @@
  * Copyright:
  *    (C) 2000 - 2005 Embedded Artists AB
  *
+ * Annotation:
+ *    This library has been adjusted to meet the needs of 'Pacman Project'.
+ *
+ * File:
+ *    config.c
+ *
  * Description:
  *    Framework for ARM7 processor
  *
  *****************************************************************************/
+
 #ifndef _config_h_
 #define _config_h_
 
-
-/******************************************************************************
- * Defines, macros, and typedefs
- *****************************************************************************/
+/***********/
+/* Defines */
+/***********/
 
 #define FOSC 12000000                 /* External clock input frequency (must be between 10 MHz and 25 MHz) */
 
