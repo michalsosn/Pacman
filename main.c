@@ -40,8 +40,8 @@
 #define INIT_STACK_SIZE  	400
 #define GAME_STACK_SIZE    1200
 
- // LCD contrast value
- #define LCD_CONTRAST		 50
+// LCD contrast value (this value should be from 0 to 127)
+#define LCD_CONTRAST		 50
 
 /*************/
 /* Variables */
@@ -58,12 +58,11 @@ static tU8 gameStack[GAME_STACK_SIZE];
 static void initializationProcess(void* arg);
 static void gameProcess(void *arg);
 
-// The first function to be executed.
-// Creates the initialization process and then starts the OS.
-// Initialization process is executed with the highest priority to make sure no other processes start before it ends.
-//
-// Parameters:
-//   [in] arg - parameters passed to the function (not used)
+/*
+ * The first function to be executed.
+ * Creates the initialization process and then starts the OS.
+ * Initialization process is executed with the highest priority to make sure no other processes start before it ends.
+ */
 int main(void) {
 
   tU8 initProcError;
@@ -80,37 +79,44 @@ int main(void) {
   return 0;
 }
 
-// Initialization process is responsible for creating application processes.
-//
-// Parameters:
-//   [in] arg - parameters passed to the function (not used)
+/*
+ * Initialization process is responsible for creating application processes.
+ *
+ * Parameters:
+ *   arg - parameters passed to the function (not used)
+ */
 static void initializationProcess(void* arg) {
 	tU8 gameProcPid, gameProcError;
 
+	// Initializes the consol for debugging and control messages
 	eaInit();
+	// Initializes I2C module by resetting it
 	i2cInit();
 
-	// musicProcessOnce();
-
-	osCreateProcess(gameProcess, gameStack, GAME_STACK_SIZE, &gameProcPid, 1, NULL, &gameProcError);
+	osCreateProcess(gameProcess, gameStack, GAME_STACK_SIZE, &gameProcPid, 2, NULL, &gameProcError);
   	osStartProcess(gameProcPid, &gameProcError);
 
 	osDeleteProcess();
 }
 
-// Process reponsible for starting the game.
-//
-// Parameters:
-//   [in] arg - parameters passed to the function (not used)
+/*
+ * Process reponsible for starting and running the game.
+ *
+ * Parameters:
+ *   arg - parameters passed to the function (not used)
+ */
 static void gameProcess(void* arg) {
 
-	// initializes LCD
+	// Initializes LCD
 	lcdInit();
 	lcdContrast(LCD_CONTRAST);
-	// initializes joystick
+
+	// Initializes joystick
 	initKeyProc();
 
+	// Initializes PCA9532 for diodes around the screen
 	pca9532Init();
+
 	displayMenu();
 
 	while (1) {
@@ -124,14 +130,16 @@ static void gameProcess(void* arg) {
 		osSleep(20);
 	}
 
-	// releases the process control block (PCB)
+	// Releases the process control block (PCB)
 	osDeleteProcess();
 }
 
- // This function is called once for each timer tick interrupt in OS.
- // It should be kept as short as possible because it runs in interrupt context.
- //
- // Parameters:
- //   [in] elapsedTime - Number of elapsed milliseconds since the last call of this function.
+/*
+ * This function is called once for each timer tick interrupt in OS.
+ * It should be kept as short as possible because it runs in interrupt context.
+ *
+ * Parameters:
+ *   elapsedTime - Number of elapsed milliseconds since the last call of this function.
+ */
 void appTick(tU32 elapsedTime) {
 }
