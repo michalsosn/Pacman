@@ -55,7 +55,7 @@ static tU8 gameStack[GAME_STACK_SIZE];
 /* Functions */
 /*************/
 
-static void initializationProcess(void* arg);
+static void initializationProcess(void *arg);
 static void gameProcess(void *arg);
 
 /*
@@ -85,7 +85,7 @@ int main(void) {
  * Parameters:
  *   arg - parameters passed to the function (not used)
  */
-static void initializationProcess(void* arg) {
+static void initializationProcess(void *arg) {
 	tU8 gameProcPid, gameProcError;
 
 	// Initializes the consol for debugging and control messages
@@ -105,7 +105,7 @@ static void initializationProcess(void* arg) {
  * Parameters:
  *   arg - parameters passed to the function (not used)
  */
-static void gameProcess(void* arg) {
+static void gameProcess(void *arg) {
 
 	// Initializes LCD
 	lcdInit();
