@@ -103,6 +103,7 @@ extern unsigned char *pHeapEnd;
 /*************/
 
 void lowLevelInit(void);
+
 void eaInit(void);
 
 #endif

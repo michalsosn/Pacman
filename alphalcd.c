@@ -28,6 +28,10 @@
 #define LCD_RS        0x01000000  // P1.24
 #define LCD_BACKLIGHT 0x40000000  // P0.30
 
+/*************/
+/* Functions */
+/*************/
+
 /*****************************************************************************
  *
  * Description:
@@ -62,11 +66,11 @@ static void delay37us(void) {
 /*****************************************************************************
  *
  * Description:
- *    xxx
+ *    Sends data to alphanumeric LCD.
  * 
  * Params:
- *    [in] reg - xxx
- *    [in] data - xxx
+ *    [in] reg - should be 1 if a char (other than '\n') is sent and 0 otherwise
+ *    [in] data - data to be sent to LCD
  *
  ****************************************************************************/
 static void writeLCD(tU8 reg, tU8 data) {
