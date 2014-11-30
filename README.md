@@ -1,4 +1,4 @@
 Pacman
 ========
 
-Projekt na SysWBud
+Projekt na Systemy Wbudowane
