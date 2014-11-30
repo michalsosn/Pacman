@@ -20,22 +20,22 @@
 #include "irq/irqUart.h"
 
 
-/*****************************************************************************
- * Local variables
- ****************************************************************************/
+/*************/
+/* Variables */
+/*************/
+
 tU8 uart1TxBuf[TX_BUFFER_SIZE];
 volatile tU32 uart1TxHead = 0;
 volatile tU32 uart1TxTail = 0;
-volatile tU8  uart1TxRunning = FALSE;
+volatile tU8 uart1TxRunning = FALSE;
 
 tU8 uart1RxBuf[RX_BUFFER_SIZE];
 volatile tU32 uart1RxHead = 0;
 volatile tU32 uart1RxTail = 0;
 
-
-/*****************************************************************************
- * Implementation of public functions
- ****************************************************************************/
+/*************/
+/* Functions */
+/*************/
 
 /*****************************************************************************
  *
@@ -49,56 +49,54 @@ volatile tU32 uart1RxTail = 0;
  *    [in] fifo_mode  - FIFO control settings. Use constants in uart.h
  *
  ****************************************************************************/
-void
-initUart1(tU16 div_factor, tU8 mode, tU8 fifo_mode)
-{
-  volatile tU32 dummy;
-  
-  // enable uart #1 pins in GPIO (P0.8 = TxD1, P0.9 = RxD1)
-  PINSEL0 = (PINSEL0 & 0xfff0ffff) | 0x00050000;
+void initUart1(tU16 div_factor, tU8 mode, tU8 fifo_mode) {
+    volatile tU32 dummy;
 
-  //enable uart #1 pins in GPIO (P0.8  = TxD1, P0.9  = RxD1)
-  //                            (P0.10 = RTS1, P0.11 = CTS1)
-  // PINSEL0 = (PINSEL0 & 0xfff0ffff) | 0x00550000;
+    // enable uart #1 pins in GPIO (P0.8 = TxD1, P0.9 = RxD1)
+    PINSEL0 = (PINSEL0 & 0xfff0ffff) | 0x00050000;
 
-  U1IER = 0x00;                        //disable all uart interrupts
-  dummy = U1IIR;                       //clear all pending interrupts
-  dummy = U1RBR;                       //clear receive register
-  dummy = U1LSR;                       //clear line status register
+    //enable uart #1 pins in GPIO (P0.8  = TxD1, P0.9  = RxD1)
+    //                            (P0.10 = RTS1, P0.11 = CTS1)
+    // PINSEL0 = (PINSEL0 & 0xfff0ffff) | 0x00550000;
 
-  //set the bit rate = set uart clock (pclk) divisionfactor
-  U1LCR = 0x80;                        //enable divisor latches (DLAB bit set, bit 7)
-  U1DLL = (tU8)div_factor;             //write division factor LSB
-  U1DLM = (tU8)(div_factor >> 8);      //write division factor MSB
+    U1IER = 0x00; //disable all uart interrupts
+    dummy = U1IIR; //clear all pending interrupts
+    dummy = U1RBR; //clear receive register
+    dummy = U1LSR; //clear line status register
 
-  //set transmission and fifo mode
-  U1LCR = (mode & ~0x80);              //DLAB bit (bit 7) must be reset
-  U1FCR = fifo_mode;
+    //set the bit rate = set uart clock (pclk) divisionfactor
+    U1LCR = 0x80; //enable divisor latches (DLAB bit set, bit 7)
+    U1DLL = (tU8) div_factor; //write division factor LSB
+    U1DLM = (tU8) (div_factor >> 8); //write division factor MSB
 
-  //initialize the interrupt vector
-  VICIntSelect &= ~0x00000080;      // UART1 selected as IRQ
-  VICVectCntl7  =  0x00000027;
-  VICVectAddr7  =  (tU32)uart1ISR;  // address of the ISR
-  VICIntEnable |=  0x00000080;      // UART1 interrupt enabled
+    //set transmission and fifo mode
+    U1LCR = (mode & ~0x80); //DLAB bit (bit 7) must be reset
+    U1FCR = fifo_mode;
 
-  //initialize the transmit data queue
-  uart1TxHead    = 0;
-  uart1TxTail    = 0;
-  uart1TxRunning = FALSE;
+    //initialize the interrupt vector
+    VICIntSelect &= ~0x00000080; // UART1 selected as IRQ
+    VICVectCntl7 = 0x00000027;
+    VICVectAddr7 = (tU32) uart1ISR; // address of the ISR
+    VICIntEnable |= 0x00000080; // UART1 interrupt enabled
 
-  //initialize the receive data queue
-  uart1RxHead   = 0;
-  uart1RxTail   = 0;
+    //initialize the transmit data queue
+    uart1TxHead = 0;
+    uart1TxTail = 0;
+    uart1TxRunning = FALSE;
 
-  //enable receiver interrupts
-  // U1IER = 0x01;
+    //initialize the receive data queue
+    uart1RxHead = 0;
+    uart1RxTail = 0;
 
-  // enable receiver and modem interrupts
-  U1IER = 0x0d;
+    //enable receiver interrupts
+    // U1IER = 0x01;
 
-  // bit 6 - auto RTS
-  // bit 7 - auto CTS
-  // U1MCR = 0xc0;
+    // enable receiver and modem interrupts
+    U1IER = 0x0d;
+
+    // bit 6 - auto RTS
+    // bit 7 - auto CTS
+    // U1MCR = 0xc0;
 }
 
 /*****************************************************************************
@@ -111,47 +109,41 @@ initUart1(tU16 div_factor, tU8 mode, tU8 fifo_mode)
  *    [in] charToSend - The character to print (to uart #1) 
  *
  ****************************************************************************/
-void
-uart1SendChar(tU8 charToSend)
-{
-  volatile tU32 cpsrReg;
-  tU32 tmpHead;
+void uart1SendChar(tU8 charToSend) {
+    volatile tU32 cpsrReg;
+    tU32 tmpHead;
 
-  //calculate head index
-  tmpHead = (uart1TxHead + 1) & TX_BUFFER_MASK; 
+    //calculate head index
+    tmpHead = (uart1TxHead + 1) & TX_BUFFER_MASK;
 
-  //wait for free space in buffer
-  while(tmpHead == uart1TxTail)
-    ;
+    //wait for free space in buffer
+    while (tmpHead == uart1TxTail)
+        ;
 
-  //disable IRQ
-  cpsrReg = disIrq();
+    //disable IRQ
+    cpsrReg = disIrq();
 
-  U1IER &= ~0x02;   //disable TX IRQ
+    U1IER &= ~0x02; //disable TX IRQ
 
-  //enable IRQ
-  restoreIrq(cpsrReg);
+    //enable IRQ
+    restoreIrq(cpsrReg);
 
-  if(uart1TxRunning == TRUE)
-  {
-    uart1TxBuf[tmpHead] = charToSend; 
-    uart1TxHead         = tmpHead;
-  }
-  else
-  {
-    uart1TxRunning = TRUE;
-    U1THR          = charToSend;
-  }
+    if (TRUE == uart1TxRunning) {
+        uart1TxBuf[tmpHead] = charToSend;
+        uart1TxHead = tmpHead;
+    } else {
+        uart1TxRunning = TRUE;
+        U1THR = charToSend;
+    }
 
-  //disable IRQ
-  cpsrReg = disIrq();
+    //disable IRQ
+    cpsrReg = disIrq();
 
-  U1IER |= 0x02;   //enable TX IRQ
+    U1IER |= 0x02; //enable TX IRQ
 
-  //enable IRQ
-  restoreIrq(cpsrReg);
+    //enable IRQ
+    restoreIrq(cpsrReg);
 }
-
 
 /*****************************************************************************
  *
@@ -162,15 +154,13 @@ uart1SendChar(tU8 charToSend)
  *    [in] charToSend - The character to print (to uart #1) 
  *
  ****************************************************************************/
-void
-uart1SendCh(tU8 charToSend)
-{
-  if(charToSend == '\n')
-    uart1SendChar('\r');
+void uart1SendCh(tU8 charToSend) {
+    if ('\n' == charToSend) {
+        uart1SendChar('\r');
+    }
 
-  uart1SendChar(charToSend);
+    uart1SendChar(charToSend);
 }
-
 
 /*****************************************************************************
  *
@@ -181,11 +171,11 @@ uart1SendCh(tU8 charToSend)
  *    [in] pString - Pointer to NULL-terminated string to be printed 
  *
  ****************************************************************************/
-void
-uart1SendString(tU8 *pString)
-{
-  while(*pString)
-    uart1SendCh(*pString++);
+void uart1SendString(tU8 *pString) {
+    while (*pString) {
+        uart1SendCh(*pString);
+        ++pString;
+    }
 }
 
 /*****************************************************************************
@@ -198,11 +188,11 @@ uart1SendString(tU8 *pString)
  *    [in] count - Number of characters to print
  *
  ****************************************************************************/
-void
-uart1SendChars(char *pBuff, tU16 count)
-{
-  while (count--)
-    uart1SendChar(*pBuff++);
+void uart1SendChars(char *pBuff, tU16 count) {
+    while (count--) {
+        uart1SendChar(*pBuff);
+        ++pBuff;
+    }
 }
 
 /*****************************************************************************
@@ -214,15 +204,13 @@ uart1SendChars(char *pBuff, tU16 count)
  *    The received character. 
  *
  ****************************************************************************/
-tU8
-uart1GetCh(void)
-{
-	tU8 rxChar;
+tU8 uart1GetCh(void) {
+    tU8 rxChar;
 
-  //wait for a character to be available
-  while(uart1GetChar(&rxChar) == FALSE)
-    ;
-  return rxChar;
+    //wait for a character to be available
+    while (FALSE == uart1GetChar(&rxChar))
+        ;
+    return rxChar;
 }
 
 /*****************************************************************************
@@ -238,18 +226,16 @@ uart1GetCh(void)
  *    TRUE if character was received, else FALSE.
  *
  ****************************************************************************/
-tU8
-uart1GetChar(tU8 *pRxChar)
-{
-  tU32 tmpTail;
+tU8 uart1GetChar(tU8 *pRxChar) {
+    tU32 tmpTail;
 
-  /* buffer is empty */
-  if(uart1RxHead == uart1RxTail)
-    return FALSE;
+    /* buffer is empty */
+    if (uart1RxHead == uart1RxTail)
+        return FALSE;
 
-  tmpTail     = (uart1RxTail + 1) & RX_BUFFER_MASK;
-  uart1RxTail = tmpTail; 
+    tmpTail = (uart1RxTail + 1) & RX_BUFFER_MASK;
+    uart1RxTail = tmpTail;
 
-  *pRxChar = uart1RxBuf[tmpTail];
-  return TRUE;
+    *pRxChar = uart1RxBuf[tmpTail];
+    return TRUE;
 }

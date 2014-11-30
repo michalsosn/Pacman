@@ -13,24 +13,26 @@
 #ifndef _UART_H_
 #define _UART_H_
 
-/******************************************************************************
- * Includes
- *****************************************************************************/
+/************/
+/* Includes */
+/************/
+
 #include "../pre_emptive_os/api/general.h"
 #include <lpc2xxx.h>
 
-/******************************************************************************
- * Defines and typedefs
- *****************************************************************************/
-//size of transmit buffer
+/***********/
+/* Defines */
+/***********/
+
+// size of transmit buffer
 #define TX_BUFFER_SIZE 64
 #define TX_BUFFER_MASK (TX_BUFFER_SIZE-1)
 
-//size of receive buffer
+// size of receive buffer
 #define RX_BUFFER_SIZE 64
 #define RX_BUFFER_MASK (RX_BUFFER_SIZE-1)
 
-//bit definitions in LCR and FCR registers in the UART
+// bit definitions in LCR and FCR registers in the UART
 #define ULCR_CHAR_7   0x02
 #define ULCR_CHAR_8   0x03
 #define ULCR_PAR_NO   0x00
@@ -45,12 +47,12 @@
 #define UFCR_FIFO_TRIG8  0x80
 #define UFCR_FIFO_TRIG14 0xc0
 
-//define for determning the correct uart clock division factor
-//Note that the expressions should always be constants and fully evaluated at
-//compile time, else a lot of code will be generated.
+// define for determning the correct uart clock division factor
+// Note that the expressions should always be constants and fully evaluated at
+// compile time, else a lot of code will be generated.
 #define UART_BPS(pclk,bps) (tU16)((pclk / ((bps) * 16.0)) + 0.5)
 
-//definitions for some common bitrates
+// definitions for some common bitrates
 #define B1200(pclk)         UART_BPS(pclk,1200)
 #define B2400(pclk)         UART_BPS(pclk,2400)
 #define B9600(pclk)         UART_BPS(pclk,9600)
@@ -59,7 +61,7 @@
 #define B57600(pclk)        UART_BPS(pclk,57600)
 #define B115200(pclk)       UART_BPS(pclk,115200)
 
-//definitions for mode settings
+// definitions for mode settings
 #define UART_7N1      (tU8)(ULCR_CHAR_7 + ULCR_PAR_NO   + ULCR_STOP_1)
 #define UART_7N2      (tU8)(ULCR_CHAR_7 + ULCR_PAR_NO   + ULCR_STOP_2)
 #define UART_7E1      (tU8)(ULCR_CHAR_7 + ULCR_PAR_EVEN + ULCR_STOP_1)
@@ -73,12 +75,16 @@
 #define UART_8O1      (tU8)(ULCR_CHAR_8 + ULCR_PAR_ODD  + ULCR_STOP_1)
 #define UART_8O2      (tU8)(ULCR_CHAR_8 + ULCR_PAR_ODD  + ULCR_STOP_2)
 
-//definitions for FIFO control settings
+// definitions for FIFO control settings
 #define UART_FIFO_OFF (0x00)
 #define UART_FIFO_1   (tU8)(UFCR_FIFO_ENABLE + UFCR_FIFO_TRIG1)
 #define UART_FIFO_4   (tU8)(UFCR_FIFO_ENABLE + UFCR_FIFO_TRIG4)
 #define UART_FIFO_8   (tU8)(UFCR_FIFO_ENABLE + UFCR_FIFO_TRIG8)
 #define UART_FIFO_14  (tU8)(UFCR_FIFO_ENABLE + UFCR_FIFO_TRIG14)
+
+/*************/
+/* Functions */
+/*************/
 
 /*****************************************************************************
  *
@@ -171,6 +177,5 @@ tU8 uart1GetCh(void);
  *
  ****************************************************************************/
 tU8 uart1GetChar(tU8 *pRxChar);
-
 
 #endif

@@ -1,5 +1,19 @@
+/******************************************************************************
+ *
+ * File:
+ *    i2c.h
+ * 
+ * Description:
+ *    The library is responsible for communication over I2C.
+ *
+ *****************************************************************************/
+
 #ifndef _I2C_H
 #define _I2C_H
+
+/***********/
+/* Defines */
+/***********/
 
 /* modes */
 #define I2C_MODE_ACK0 0
@@ -15,7 +29,6 @@
 #define I2C_CODE_FULL  -2
 #define I2C_CODE_EMPTY -3
 #define I2C_CODE_BUSY  -4
-
 
 
 #define I2C_SLAVEADR_RCV  0xA1
@@ -85,19 +98,19 @@
 #define I2C_CONCLR_AAC_NO_EFFECT     0x00   /* No effect */
 #define I2C_CONCLR_AAC_CLEAR         0x01   /* Clear acknowledge */
 
+/*************/
+/* Functions */
+/*************/
 
-
-tU8  i2cCheckStatus(void);
+tU8 i2cCheckStatus(void);
 void i2cInit(void);
-tS8  i2cStart(void);
-tS8  i2cRepeatStart(void);
-tS8  i2cStop(void);
-tS8  i2cPutChar(tU8 data);
-tS8  i2cGetChar(tU8  mode, tU8* pData);
-tS8  i2cWrite(tU8  addr, tU8* pData, tU16 len);
-tS8  i2cRead(tU8  addr, tU8* pBuf, tU16 len);
-
-
-
+tS8 i2cStart(void);
+tS8 i2cRepeatStart(void);
+tS8 i2cStop(void);
+tS8 i2cPutChar(tU8 data);
+tS8 i2cGetChar(tU8 mode, tU8* pData);
+tS8 i2cWrite(tU8 addr, tU8* pData, tU16 len);
+tS8 i2cRead(tU8 addr, tU8* pBuf, tU16 len);
+tS8 i2cWriteWithWait(tU8 data);
 
 #endif

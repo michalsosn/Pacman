@@ -4,7 +4,7 @@
  *    (C) 2006 Embedded Artists AB
  *
  * Annotation:
- *    This library has been rebuilt and adjusted to the needs of 'Pacman Project'.
+ *    This library has been adjusted to the needs of 'Pacman Project'.
  *
  * File:
  *    lcd.h
@@ -15,6 +15,10 @@
  *****************************************************************************/
 #ifndef _LCD_H_
 #define _LCD_H_
+
+/*************/
+/* Functions */
+/*************/
 
 void lcdInit(void);
 void lcdOff(void);
