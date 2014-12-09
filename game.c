@@ -25,6 +25,8 @@
 #include "music.h"
 #include "adc.h"
 #include "bluetooth.h"
+#include "sdcard.h"
+#include "startup/printf_P.h"
 
 /***********/
 /* Defines */
@@ -76,7 +78,7 @@ tU8 currentScore;
 void changeGameSpeed() {
     tU16 temperature = getTemperature();
     timeStep = 6 * (31 - temperature);
-    if (timeStep == 0) {
+    if (timeStep <= 0) {
         timeStep = 6;
     }
 
@@ -280,7 +282,7 @@ void displayCharacter(Move move, tU8 animationStep) {
  *
  ****************************************************************************/
 void initAlpha() {
-    char message[] = "Current score:\n              0";
+    char message[] = "Current score:  \n              0";
     messageOnAlpha(message, TRUE);
 }
 
@@ -378,7 +380,13 @@ void startGame(void) {
     onTimeToEatChanged(displayTimeToEat);
 
     // initializes the game
-    initPacman();
+	tU8 boardRead = readBoard(&(board[0][0]), BOARD_HEIGHT, BOARD_WIDTH);
+	//if (TRUE == boardRead) {
+	//	initPacman(FALSE);
+	//} else {
+		initPacman(TRUE);
+	//}
+    printf("Wczytalem plansze, jestem z powrotem w game.c\n");
 
     initAlpha();
 
@@ -454,5 +462,5 @@ void startGame(void) {
     displayText("Init Bluetooth");
     initBluetooth();
     displayText("Send \"result\"");
-    sendDataThroughBluetooth(message);
+    sendDataThroughBluetooth((unsigned char*) message);
 }

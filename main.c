@@ -38,7 +38,7 @@
 
 // stack size for processes:
 #define INIT_STACK_SIZE  	400
-#define GAME_STACK_SIZE    1200
+#define GAME_STACK_SIZE    2400
 
 // LCD contrast value (this value should be from 0 to 127)
 #define LCD_CONTRAST		 50

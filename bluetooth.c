@@ -86,7 +86,7 @@ tBool waitForAnswer(char *expectedAnswer, tU8 answerLength, tU8 maxLength) {
  *    [in] text - text to be sent
  *
  ****************************************************************************/
-void sendDataThroughBluetooth(char *text) {
+void sendDataThroughBluetooth(unsigned char *text) {
     if (waitForAnswer("BTSTATE:4", 9, 250)) {
         printf("\nOtrzymalem BTSTATE:4\n");
         waitForAnswer("result", 6, 250);
@@ -138,14 +138,14 @@ void initBluetooth(void) {
 
     osSleep(25);
 
-    uart1SendString("+++");
+    uart1SendString((unsigned char*) "+++");
     printf("Wyslalem sekwencje +++\n");
 
     osSleep(20);
 
     waitForAnswer("OK", 2, 200);
 
-    uart1SendString("\n+STAUTO=0\n");
+    uart1SendString((unsigned char*) "\n+STAUTO=0\n");
     printf("\nWylaczylem automatyczne laczenie\n");
 
     waitForAnswer("STAUTO", 6, 240);
@@ -153,14 +153,14 @@ void initBluetooth(void) {
 
     printf("\nUstawiam tryb Slave\n");
 
-    uart1SendString("\n+STWMOD=0\n");
+    uart1SendString((unsigned char*) "\n+STWMOD=0\n");
     printf("\nWyslalem STWMOD\n");
 
     waitForAnswer("STWMOD", 6, 240);
     waitForAnswer("OK", 2, 240);
 
     printf("\nZmieniam nazwe\n");
-    uart1SendString("\n+STNA=pacman\n");
+    uart1SendString((unsigned char*) "\n+STNA=pacman\n");
     printf("\nWyslalem STNA\n");
 
     waitForAnswer("STNA", 4, 240);
@@ -169,7 +169,7 @@ void initBluetooth(void) {
     osSleep(100);
 
     printf("Zezwalam na odpytywanie\n");
-    uart1SendString("\n+INQ=1\n");
+    uart1SendString((unsigned char*) "\n+INQ=1\n");
     printf("\nWyslalem INQ\n");
 
     waitForAnswer("OK", 2, 240);

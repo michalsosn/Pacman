@@ -105,10 +105,13 @@ static void simplePrint(void (*outputFnk) (char ch), const char * fmt, va_list a
 
     for (;;) {
 
-        ch = *fmt;
-        ++fmt;
-        while ('%' != ch) {
+        while ('%' != (ch = *fmt++)) {
             if ('\0' == ch) {
+
+
+
+
+
                 return;
             }
             outputFnk(ch);
@@ -117,9 +120,7 @@ static void simplePrint(void (*outputFnk) (char ch), const char * fmt, va_list a
 
 reswitch:
 
-        ch = *fmt;
-        ++fmt;
-        switch (ch) {
+        switch (ch = *fmt++) {
             case '\0':
                 return;
 
@@ -134,11 +135,9 @@ reswitch:
 
             case 's':
                 p = va_arg(ap, char *);
-                ch = *p;
-                ++p;
-                while (0 != ch) {
-                    outputFnk(ch);
-                }
+                while ((ch = *p++) != 0) {
+					outputFnk(ch);
+				}
                 break;
 
             case 'd':
@@ -476,7 +475,7 @@ int consolGetIntNum(void) {
         wLastIndex--;
     }
 
-    if (wBase == 10) {
+    if (10 == wBase) {
         wResult = atoi(pString);
         wResult = wMinus ? (-1 * wResult) : wResult;
     } else {

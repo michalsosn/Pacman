@@ -23,6 +23,6 @@
 
 void initBluetooth(void);
 
-void sendDataThroughBluetooth(char *text);
+void sendDataThroughBluetooth(unsigned char *text);
 
 #endif

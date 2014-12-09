@@ -54,14 +54,14 @@ typedef struct character {
 /********************/
 
 // Contains static elements of the board.
-extern Field board[21][21];
+extern Field board[BOARD_HEIGHT][BOARD_WIDTH];
 
 /*************/
 /* Functions */
 /*************/
 
 // Initializes game
-void initPacman();
+void initPacman(tU8 useDefaultBoard);
 
 // Registers function for changing pacman direction
 void setDirectionCallback(Direction (*updateDirection)(struct character *c));

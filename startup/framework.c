@@ -176,7 +176,7 @@ void exceptionHandlerInit(void) {
 #endif
 
     //set heap limits
-    pHeapStart = &end;
+    pHeapStart = (unsigned char*) &end;
     pHeapEnd = (unsigned char*) ((STK_SADDR - 1) & 0xfffffffc);
 }
 

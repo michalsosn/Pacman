@@ -66,7 +66,12 @@ CSRCS   = main.c        \
 		  uart.c		\
 		  bluetooth.c   \
 		  adc.c 		\
-		  rgbled.c
+		  rgbled.c		\
+		  sdcard.c		\
+		  spi.c			\
+		  pff.c			\
+		  diskio.c 		\
+		  sd.c			\
 
 # List assembler source files here
 ASRCS   = 

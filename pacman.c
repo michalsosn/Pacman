@@ -6,6 +6,7 @@
 /************/
 
 #include "pacman.h"
+#include "startup/printf_P.h"
 
 /*************/
 /* Variables */
@@ -74,7 +75,7 @@ static void generateSeed(){
 }
 
 static tU8 random() {
-    seed = (seed * 1103515245 + 12345) % 2147483648;
+    seed = (seed * 1103515245 + 12345) % 2147483647;
     return seed;
 }
 
@@ -252,23 +253,42 @@ static Direction defaultGhostMovement(Character *c){
     return ranDir;
 }
 
-//Initialize characters
-void initPacman()
-{
-	int row, column;
-	for (row = 0; row < BOARD_HEIGHT; ++row) {
-		for (column = 0; column < BOARD_WIDTH; ++column) {
-			board[row][column] = defaultBoard[row][column];
+// Calculates the number of points needed to complete the level
+int calculatePointsToComplete() {
+	int result = 0;
+	int i, j;
+	for (i = 0; i < BOARD_HEIGHT; ++i) {
+		for (j = 0; j < BOARD_WIDTH; ++j) {
+			if (board[i][j] == 2) {
+				++result;
+			}
 		}
 	}
+	return result;
+}
+
+// Initialize characters
+void initPacman(tU8 useDefaultBoard)
+{
+	printf("InitPacman rozpoczete\n");
+	if (useDefaultBoard == TRUE) {
+		int row, column;
+		for (row = 0; row < BOARD_HEIGHT; ++row) {
+			for (column = 0; column < BOARD_WIDTH; ++column) {
+				board[row][column] = defaultBoard[row][column];
+			}
+		}
+	}
+	printf("Plansza wczytana do odpowiedniej tablicy\n");
 
     ghostEatingMode = 0;
     moveToInitPositions = 1;
     level = 0;
     lives = 3;
     score = 0;
-    pointsToCompleteLevel = 174;
     seed = 128;
+	
+	pointsToCompleteLevel = calculatePointsToComplete();
 
     pacman.birthplace.x = 10;
     pacman.birthplace.y = 15;
@@ -277,7 +297,9 @@ void initPacman()
     pacman.position.x = 10;
     pacman.position.y = 15;
     pacman.type = PACMAN;
-	if (!pacman.updateDirection) pacman.updateDirection = defaultGhostMovement;
+	if (!pacman.updateDirection) {
+		pacman.updateDirection = defaultGhostMovement;
+	}
 
     ghosts[0].birthplace.x = 10;
     ghosts[0].birthplace.y = 6;
@@ -331,7 +353,9 @@ void initPacman()
     ghosts[3].updateDirection = defaultStayAtHome;
     ghosts[3].defaultUpdateDirection = defaultGhostMovement;
 
-    if (handleLifeLost) handleLifeLost(lives);
+    if (handleLifeLost) {
+		handleLifeLost(lives);
+	}
 }
 
 void setDirectionCallback(Direction (*updateDirection)(struct character *))

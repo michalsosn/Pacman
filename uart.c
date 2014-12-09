@@ -230,8 +230,9 @@ tU8 uart1GetChar(tU8 *pRxChar) {
     tU32 tmpTail;
 
     /* buffer is empty */
-    if (uart1RxHead == uart1RxTail)
+    if (uart1RxHead == uart1RxTail) {
         return FALSE;
+	}
 
     tmpTail = (uart1RxTail + 1) & RX_BUFFER_MASK;
     uart1RxTail = tmpTail;
