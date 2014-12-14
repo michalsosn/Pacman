@@ -1,5 +1,12 @@
-// pacman.c
-// Reponsible for game logic.
+/******************************************************************************
+ *
+ * File:
+ *    pacman.c
+ * 
+ * Description:
+ *    Reponsible for game logic
+ *
+ *****************************************************************************/
 
 /************/
 /* Includes */
@@ -43,19 +50,22 @@ Field defaultBoard[BOARD_HEIGHT][BOARD_WIDTH] = {
 
 Field board[BOARD_HEIGHT][BOARD_WIDTH];
 
+//game state indicators
 static tU8 ghostEatingMode;
 static tU8 moveToInitPositions;
 
+//game counters
 static tU8 level;
 static tU8 lives;
 static tU8 score;
 static tU8 pointsToCompleteLevel;
 
+//seed for random function
 static tU8 seed;
 
-/*************/
-/* Handlers  */
-/*************/
+/************/
+/* Handlers */
+/************/
 
 static void (*handleGameLost)(tU8 level, tU8 score);
 static void (*handleLifeLost)(tU8 lives);
@@ -68,21 +78,49 @@ static void (*handleTimeToEatChanged)(tU8 remainingTime);
 /* Functions */
 /*************/
 
-static void generateSeed(){
+/*****************************************************************************
+ *
+ * Description:
+ *    Generates seed for random() function
+ *
+ ****************************************************************************/
+static void generateSeed() {
     seed = seed * (lives * score * pointsToCompleteLevel
                    + pacman.position.x * ghosts[0].position.x * ghosts[1].position.x * ghosts[2].position.x  * ghosts[3].position.x
                    + pacman.position.y * ghosts[0].position.y * ghosts[1].position.y * ghosts[2].position.y  * ghosts[3].position.y);
 }
 
+/*****************************************************************************
+ *
+ * Description:
+ *    Generates pseudo random number
+ *
+ * Returns:
+ *    tU8 - pseudo random number
+ *
+ ****************************************************************************/
 static tU8 random() {
     seed = (seed * 1103515245 + 12345) % 2147483647;
     return seed;
 }
 
-inline static Coordinates calculateMove(Coordinates coords, Direction dir){
+/*****************************************************************************
+ *
+ * Description:
+ *    Calculates position after move in given direction
+ *
+ * Params:
+ *    [in] coords - current position
+ *    [in] dir - direction
+ *
+ * Returns:
+ *    Coordinates - calculated coordinates
+ *
+ ****************************************************************************/
+inline static Coordinates calculateMove(Coordinates coords, Direction dir) {
     Coordinates newCoords = coords;
 
-    switch(dir) {
+    switch (dir) {
         case LEFT: newCoords.x--; break;
         case RIGHT: newCoords.x++; break;
         case UP: newCoords.y--; break;
@@ -92,32 +130,39 @@ inline static Coordinates calculateMove(Coordinates coords, Direction dir){
     return newCoords;
 }
 
-inline static tU8 canMove(Coordinates coords, CharacterType type){
-    if(board[coords.y][coords.x] == WALL) return 0;
-    if(board[coords.y][coords.x] == DOORS && type == PACMAN) return 0;
-    return 1;
+/*****************************************************************************
+ *
+ * Description:
+ *    Checks if given character can move to given position
+ *
+ * Params:
+ *    [in] coords - destination coordinates
+ *    [in] type - type of character
+ *
+ * Returns:
+ *    tU8 - TRUE if given character can move to given position, FALSE if not
+ *
+ ****************************************************************************/
+inline static tU8 canMove(Coordinates coords, CharacterType type) {
+    if (board[coords.y][coords.x] == WALL) return FALSE;
+    if (board[coords.y][coords.x] == DOORS && type == PACMAN) return FALSE;
+    return TRUE;
 }
 
-inline static Direction turnRight(Direction dir){
-    switch(dir){
-        case LEFT: return UP;
-        case DOWN: return LEFT;
-        case RIGHT: return DOWN;
-        default: return RIGHT;
-    }
-}
-
-inline static Direction turnLeft(Direction dir){
-    switch(dir){
-        case LEFT: return DOWN;
-        case DOWN: return RIGHT;
-        case RIGHT: return UP;
-        default: return LEFT;
-    }
-}
-
-inline static Direction turnBack(Direction dir){
-    switch(dir){
+/*****************************************************************************
+ *
+ * Description:
+ *    Calculates direction after turning back
+ *
+ * Params:
+ *    [in] dir - direction before turn
+ *
+ * Returns:
+ *    Direction - direction after turn
+ *
+ ****************************************************************************/
+inline static Direction turnBack(Direction dir) {
+    switch (dir) {
         case LEFT: return RIGHT;
         case DOWN: return UP;
         case RIGHT: return LEFT;
@@ -125,8 +170,20 @@ inline static Direction turnBack(Direction dir){
     }
 }
 
-static Move move(Character *character){
-    if(character->updateDirection)
+/*****************************************************************************
+ *
+ * Description:
+ *    Changes position of given character according to its direction
+ *
+ * Params:
+ *    [in] character - a moving character
+ *
+ * Returns:
+ *    Move - structure describing character's move
+ *
+ ****************************************************************************/
+static Move move(Character *character) {
+    if (character->updateDirection)
         character->nextDirection = character->updateDirection(character);
 
     Move move;
@@ -135,11 +192,11 @@ static Move move(Character *character){
     move.from = character->position;
     move.to = calculateMove(character->position, character->nextDirection);
 
-    if(canMove(move.to, move.type)) {
+    if (canMove(move.to, move.type)) {
         character->currentDirection = character->nextDirection;
     } else {
         move.to = calculateMove(character->position, character->currentDirection);
-        if(!canMove(move.to, move.type)) {
+        if (!canMove(move.to, move.type)) {
             move.to = move.from;
         }
     }
@@ -148,29 +205,53 @@ static Move move(Character *character){
     return move;
 }
 
-// Try to exit home
+/*****************************************************************************
+ *
+ * Description:
+ *    Default updating direction function for ghosts.
+ *    Enables them to exit home.
+ *
+ * Params:
+ *    [in] c - a moving character
+ *
+ * Returns:
+ *    Direction - next character's direction
+ *
+ ****************************************************************************/
 static Direction defaultExitHome(Character *c) {
-    if(c->position.x == 10 && c->position.y == 8) {
+    if (10 == c->position.x && 8 == c->position.y) {
         return UP;
     }
-    if(c->position.x == 10 && c->position.y == 7) {
+    if (10 == c->position.x && 7 == c->position.y) {
         return UP;
     }
-    if(c->position.x == 9 && c->position.y == 8) {
+    if (9 == c->position.x && 8 == c->position.y) {
         return RIGHT;
     }
-    if(c->position.x == 11 && c->position.y == 8) {
+    if (11 == c->position.x && 8 == c->position.y) {
         return LEFT;
     }
-    if(c->position.x == 10 && c->position.y == 6) {
+    if (10 == c->position.x && 6 == c->position.y) {
         c->updateDirection = c->defaultUpdateDirection;
     }
     return LEFT;
 }
 
-// Stay at home until startTime
+/*****************************************************************************
+ *
+ * Description:
+ *    Default updating direction function for ghosts.
+ *    Enables them to stay at home until startTime.
+ *
+ * Params:
+ *    [in] c - a moving character
+ *
+ * Returns:
+ *    Direction - next character's direction
+ *
+ ****************************************************************************/
 static Direction defaultStayAtHome(Character *c) {
-    if(!c->timeToStart){
+    if (!c->timeToStart) {
         generateSeed();
         c->updateDirection = defaultExitHome;
         return defaultExitHome(c);
@@ -180,16 +261,28 @@ static Direction defaultStayAtHome(Character *c) {
     }
 }
 
-// Try to go home
+/*****************************************************************************
+ *
+ * Description:
+ *    Default updating direction function for ghosts.
+ *    Enables them to go back home.
+ *
+ * Params:
+ *    [in] c - a moving character
+ *
+ * Returns:
+ *    Direction - next character's direction
+ *
+ ****************************************************************************/
 static Direction defaultGoBackHome(Character *c) {
-    if(c->position.x == c->birthplace.x && c->position.y == c->birthplace.y){
+    if (c->position.x == c->birthplace.x && c->position.y == c->birthplace.y) {
         c->type = GHOST;
         c->updateDirection = defaultExitHome;
         return defaultExitHome(c);
     }
 
-    if (c->position.y == 7) {
-        switch(c->position.x){
+    if (7 == c->position.y) {
+        switch (c->position.x) {
             case 3:
             case 5:
                 return RIGHT;
@@ -202,8 +295,8 @@ static Direction defaultGoBackHome(Character *c) {
             case 10:
                 return DOWN;
         }
-    } else if (c->position.y == 6) {
-        switch(c->position.x){
+    } else if (6 == c->position.y) {
+        switch (c->position.x) {
             case 7:
                 return RIGHT;
             case 13:
@@ -211,23 +304,23 @@ static Direction defaultGoBackHome(Character *c) {
             case 10:
                 return DOWN;
         }
-    } else if (c->position.y == 9) {
-        switch(c->position.x){
+    } else if (9 == c->position.y) {
+        switch (c->position.x) {
             case 4:
                 return RIGHT;
             case 16:
                 return LEFT;
         }
-    } else if (c->position.y == 15) {
-        switch(c->position.x){
+    } else if (15 == c->position.y) {
+        switch (c->position.x) {
             case 8:
             case 12:
                 return UP;
         }
-    } else if (c->position.y == 8 && c->position.x == 10) {
+    } else if (8 == c->position.y && 10 == c->position.x) {
         Direction dir = 0;
         Coordinates coords = calculateMove(c->position, dir);
-        while(coords.x != c->birthplace.x || coords.y != c->birthplace.y) {
+        while (coords.x != c->birthplace.x || coords.y != c->birthplace.y) {
             dir++;
             coords = calculateMove(c->position, dir);
         }
@@ -236,30 +329,50 @@ static Direction defaultGoBackHome(Character *c) {
     return c->defaultUpdateDirection(c);
 }
 
-// Default random moves, no turning back
-static Direction defaultGhostMovement(Character *c){
-    if(c->position.x == 10 && c->position.y == 6) {
+/*****************************************************************************
+ *
+ * Description:
+ *    Default updating direction function for ghosts.
+ *    Enables them to move randomly, but without turning back.
+ *
+ * Params:
+ *    [in] c - a moving character
+ *
+ * Returns:
+ *    Direction - next character's direction
+ *
+ ****************************************************************************/
+static Direction defaultGhostMovement(Character *c) {
+    if (10 == c->position.x && 6 == c->position.y) {
         return RIGHT;
     }
     Direction ranDir;
     Coordinates coords;
     do {
         ranDir = random() % 3;
-        if(c->currentDirection == turnBack(ranDir)){
+        if (c->currentDirection == turnBack(ranDir)) {
             ranDir = 3;
         }
         coords = calculateMove(c->position, ranDir);
-    } while(!canMove(coords, c->type));
+    } while (!canMove(coords, c->type));
     return ranDir;
 }
 
-// Calculates the number of points needed to complete the level
+/*****************************************************************************
+ *
+ * Description:
+ *    Calculates the number of points needed to complete the level
+ *
+ * Returns:
+ *    int - number of points needed to complete the level
+ *
+ ****************************************************************************/
 int calculatePointsToComplete() {
 	int result = 0;
 	int i, j;
 	for (i = 0; i < BOARD_HEIGHT; ++i) {
 		for (j = 0; j < BOARD_WIDTH; ++j) {
-			if (board[i][j] == 2) {
+			if (board[i][j] == POINT) {
 				++result;
 			}
 		}
@@ -267,7 +380,15 @@ int calculatePointsToComplete() {
 	return result;
 }
 
-// Initialize characters
+/*****************************************************************************
+ *
+ * Description:
+ *    Initializes board, characters and game counters with default values.
+ *
+ * Params:
+ *    [in] useDefaultBoard - value that specifies if default board should be used
+ *
+ ****************************************************************************/
 void initPacman(tU8 useDefaultBoard)
 {
 	printf("InitPacman rozpoczete\n");
@@ -281,12 +402,12 @@ void initPacman(tU8 useDefaultBoard)
 	}
 	printf("Plansza wczytana do odpowiedniej tablicy\n");
 
-    ghostEatingMode = 0;
-    moveToInitPositions = 1;
-    level = 0;
-    lives = 3;
-    score = 0;
-    seed = 128;
+    ghostEatingMode = FALSE;
+    moveToInitPositions = TRUE;
+    level = INIT_LEVEL;
+    lives = INIT_LIVES;
+    score = INIT_SCORE;
+    seed = INIT_SEED;
 	
 	pointsToCompleteLevel = calculatePointsToComplete();
 
@@ -297,6 +418,7 @@ void initPacman(tU8 useDefaultBoard)
     pacman.position.x = 10;
     pacman.position.y = 15;
     pacman.type = PACMAN;
+	
 	if (!pacman.updateDirection) {
 		pacman.updateDirection = defaultGhostMovement;
 	}
@@ -358,60 +480,143 @@ void initPacman(tU8 useDefaultBoard)
 	}
 }
 
+/*****************************************************************************
+ *
+ * Description:
+ *    Sets callback for changing pacman's direction
+ *
+ * Params:
+ *    [in] updateDirection - pointer to function to be used as a callback
+ *
+ ****************************************************************************/
 void setDirectionCallback(Direction (*updateDirection)(struct character *))
 {
     pacman.updateDirection = updateDirection;
 }
 
-
+/*****************************************************************************
+ *
+ * Description:
+ *    Sets callback for changing ghost's direction
+ *
+ * Params:
+ *    [in] ghost - number indicating for which ghost callback will be used
+ *    [in] updateDirection - pointer to function to be used as a callback
+ *
+ ****************************************************************************/
 void setGhostDirectionCallback(tU8 ghost, Direction (*updateDirection)(struct character *))
 {
-    if(ghost < NUMBER_OF_GHOSTS) {
+    if (ghost < NUMBER_OF_GHOSTS) {
         ghosts[ghost].updateDirection = updateDirection;
     }
 }
 
-
+/*****************************************************************************
+ *
+ * Description:
+ *    Sets callback to be called after losing game
+ *
+ * Params:
+ *    [in] handler - pointer to function to be used as a callback
+ *
+ ****************************************************************************/
 void onGameLost(void (*handler)(tU8, tU8))
 {
     handleGameLost = handler;
 }
 
-
+/*****************************************************************************
+ *
+ * Description:
+ *    Sets callback to be called after losing life
+ *
+ * Params:
+ *    [in] handler - pointer to function to be used as a callback
+ *
+ ****************************************************************************/
 void onLifeLost(void (*handler)(tU8))
 {
     handleLifeLost = handler;
 }
 
-
+/*****************************************************************************
+ *
+ * Description:
+ *    Sets callback to be called after score change
+ *
+ * Params:
+ *    [in] handler - pointer to function to be used as a callback
+ *
+ ****************************************************************************/
 void onScoreChanged(void (*handler)(tU8))
 {
     handleScoreChanged = handler;
 }
 
-
+/*****************************************************************************
+ *
+ * Description:
+ *    Sets callback to be called after completing level
+ *
+ * Params:
+ *    [in] handler - pointer to function to be used as a callback
+ *
+ ****************************************************************************/
 void onLevelCompleted(void (*handler)(tU8, tU8))
 {
     handleLevelComplete = handler;
 }
 
-
+/*****************************************************************************
+ *
+ * Description:
+ *    Sets callback to be called after eating a ghost
+ *
+ * Params:
+ *    [in] handler - pointer to function to be used as a callback
+ *
+ ****************************************************************************/
 void onGhostEaten(void (*handler)())
 {
     handleGhostEaten = handler;
 }
 
+/*****************************************************************************
+ *
+ * Description:
+ *    Sets callback to be called after change of remaining time in which
+ *    pacman can eat ghosts
+ *
+ * Params:
+ *    [in] handler - pointer to function to be used as a callback
+ *
+ ****************************************************************************/
 void onTimeToEatChanged(void (*handler)(tU8))
 {
     handleTimeToEatChanged = handler;
 }
 
+/*****************************************************************************
+ *
+ * Description:
+ *    Makes one step of game loop. 
+ *    Includes moving all characters according to their directions and updating
+ *    directions for next move, detecting collisions, updating game counters.
+ *    Calls callbacks when necessary.
+ *
+ * Returns:
+ *    Move* - pointer to array of moves executed in current step of game loop.
+ *            If current step aims to restore initial positions (first function
+ *            call after initialization or losing life), from and to coordinates
+ *            of each move are equal.
+ *
+ ****************************************************************************/
 Move *makeMove()
 {
     tU8 i;
     static Move moves[1 + NUMBER_OF_GHOSTS];
 
-    if(moveToInitPositions) {
+    if (moveToInitPositions) {
         moves[0].from = pacman.birthplace;
         moves[0].to = pacman.birthplace;
         moves[0].type = pacman.type;
@@ -426,7 +631,7 @@ Move *makeMove()
             ghosts[i].timeToStart = ghosts[i].startTime;
         }
 
-        moveToInitPositions = 0;
+        moveToInitPositions = FALSE;
         return moves;
     }
 
@@ -434,82 +639,81 @@ Move *makeMove()
 
     for (i = 0; i < NUMBER_OF_GHOSTS; ++i) {
         moves[i + 1] = move(&ghosts[i]);
-        if (ghosts[i].type != EYES && moves[i + 1].to.x == moves[0].from.x && moves[i + 1].to.y == moves[0].from.y
+        if (EYES != ghosts[i].type && moves[i + 1].to.x == moves[0].from.x && moves[i + 1].to.y == moves[0].from.y
                 && moves[i + 1].from.x == moves[0].to.x && moves[i + 1].from.y == moves[0].to.y) {
             //collision PG version
-            if(ghosts[i].type == EATABLE_GHOST) {
+            if (EATABLE_GHOST == ghosts[i].type) {
                 ghosts[i].type = EYES;
                 ghosts[i].updateDirection = defaultGoBackHome;
                 ghosts[i].position = moves[i + 1].from;
                 moves[i + 1].to = moves[i + 1].from;
                 if (handleGhostEaten) handleGhostEaten();
-                score += 10;
+                score += POINTS_FOR_EATING;
                 if (handleScoreChanged) handleScoreChanged(score);
             } else {
-                moveToInitPositions = 1;
+                moveToInitPositions = TRUE;
                 lives--;
                 if (handleLifeLost) handleLifeLost(lives);
-                for(i = 0; i < NUMBER_OF_GHOSTS; ++i) {
+                for (i = 0; i < NUMBER_OF_GHOSTS; ++i) {
                     ghosts[i].type = GHOST;
                 }
-                if(lives == 0 && handleGameLost) handleGameLost(level, score);
+                if (0 == lives && handleGameLost) handleGameLost(level, score);
                 pacman.position = moves[0].from;
                 moves[0].to = moves[0].from;
                 break;
             }
-        }
-        else if (ghosts[i].type != EYES && moves[i + 1].to.x == moves[0].to.x && moves[i + 1].to.y == moves[0].to.y){
+        } else if (EYES != ghosts[i].type && moves[i + 1].to.x == moves[0].to.x && moves[i + 1].to.y == moves[0].to.y) {
             //collision P_G version
-            if(ghosts[i].type == EATABLE_GHOST) {
+            if (EATABLE_GHOST == ghosts[i].type) {
                 ghosts[i].type = EYES;
                 ghosts[i].updateDirection = defaultGoBackHome;
                 if (handleGhostEaten) handleGhostEaten();
-                score += 10;
+                score += POINTS_FOR_EATING;
                 if (handleScoreChanged) handleScoreChanged(score);
             } else {
                 moveToInitPositions = 1;
                 lives--;
                 if (handleLifeLost) handleLifeLost(lives);
-                for(i = 0; i < NUMBER_OF_GHOSTS; ++i) {
+                for (i = 0; i < NUMBER_OF_GHOSTS; ++i) {
                     ghosts[i].type = GHOST;
                 }
-                if(lives == 0 && handleGameLost) handleGameLost(level, score);
+                if (lives == 0 && handleGameLost) handleGameLost(level, score);
                 break;
             }
         }
     }
 
-    if (board[pacman.position.y][pacman.position.x] == POINT){
+    if (POINT == board[pacman.position.y][pacman.position.x]) {
         board[pacman.position.y][pacman.position.x] = EMPTY;
         score++;
         pointsToCompleteLevel--;
         if (handleScoreChanged) handleScoreChanged(score);
-    } else if (board[pacman.position.y][pacman.position.x] == BONUS){
+    } else if (BONUS == board[pacman.position.y][pacman.position.x]) {
         board[pacman.position.y][pacman.position.x] = EMPTY;
-        score += 5;
+        score += POINTS_FOR_BONUS;
         ghostEatingMode = INIT_TIME_TO_EAT;
-        for(i = 0; i < NUMBER_OF_GHOSTS; ++i) {
-            if(ghosts[i].type == GHOST) {
+        for (i = 0; i < NUMBER_OF_GHOSTS; ++i) {
+            if (ghosts[i].type == GHOST) {
                 ghosts[i].type = EATABLE_GHOST;
             }
         }
         if (handleScoreChanged) handleScoreChanged(score);
     }
 
-    if(ghostEatingMode){
+    if (ghostEatingMode) {
         ghostEatingMode--;
         if (handleTimeToEatChanged) handleTimeToEatChanged(ghostEatingMode);
-        if(!ghostEatingMode){
-            for(i = 0; i < NUMBER_OF_GHOSTS; ++i) {
-                if(ghosts[i].type == EATABLE_GHOST) {
+        if (!ghostEatingMode) {
+            for (i = 0; i < NUMBER_OF_GHOSTS; ++i) {
+                if (ghosts[i].type == EATABLE_GHOST) {
                     ghosts[i].type = GHOST;
                 }
             }
         }
     }
 
-    if(!pointsToCompleteLevel){
-        if(handleLevelComplete) handleLevelComplete(level, score);
+    if (!pointsToCompleteLevel) {
+        if (handleLevelComplete) handleLevelComplete(level, score);
     }
 
     return moves;

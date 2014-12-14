@@ -1,3 +1,12 @@
+/******************************************************************************
+ *
+ * File:
+ *    pacman.h
+ * 
+ * Description:
+ *    Reponsible for game logic
+ *
+ *****************************************************************************/
 #ifndef _PACMAN_H_
 #define _PACMAN_H_
 
@@ -11,11 +20,20 @@
 /***********/
 /* Defines */
 /***********/
+
 // game constants
-#define NUMBER_OF_GHOSTS    4
+#define NUMBER_OF_GHOSTS     4
 #define BOARD_WIDTH         21
 #define BOARD_HEIGHT        21
 #define INIT_TIME_TO_EAT    31
+#define POINTS_FOR_EATING   10
+#define POINTS_FOR_BONUS     5
+
+// default initial values
+#define INIT_LIVES           3
+#define INIT_LEVEL           0
+#define INIT_SCORE           0
+#define INIT_SEED          128
 
 /*********/
 /* Types */
