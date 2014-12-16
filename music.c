@@ -58,8 +58,16 @@ void playBeginningSound(void) {
     for (t = 0; t < BEGINNING_SOUND_LEN; ++t) {
 		delay90usTimer();
 
-		DACR = (pacmanBeginningSound[t] << 6) |
-			   (1 << 16);
+tS32 val;
+val = pacmanBeginningSound[t] - 128;
+val = val * 2;
+if (val > 127) val = 127;
+else if (val < -127) val = -127;
+
+DACR = ((val+128) << 8) |
+		(1 << 16);
+		//DACR = (pacmanBeginningSound[t] << 6) |
+		//	   (1 << 16);
 
 		waitForTimer();
 	}

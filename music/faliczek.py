@@ -43,7 +43,7 @@ def main():
     block_align, bits_per_sample = st.unpack('<4sihhiihh', args.file.read(24)) 
 
     if audio_format != 1: 
-        raise ValueError('Warning: Audio_format = {}, file is compressed'
+        raise ValueError('Audio_format = {}, file is compressed'
                         .format(audio_format))
 
     comment('4 Subchunk1ID = {} - Contains the letters “fmt”.'.format(sub1_id))
@@ -69,7 +69,7 @@ def main():
 
     print(' **/', file=args.out)
 
-    sound_name = args.file.name[:args.file.name.find('.')] + 'Sound'
+    sound_name = args.file.name[:args.file.name.rfind('.')] + 'Sound'
     print('\nconst char {}[] = {{'.format(sound_name), file=args.out)
 
     def read_bytes(input):
