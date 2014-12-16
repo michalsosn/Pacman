@@ -8,8 +8,8 @@
  * Members:
  *    - Piotr Grzelak
  *    - Andrzej Kurczewski
- *    - Micha³ Soœnicki
- *    - Wojciech Sza³apski (team leader)
+ *    - Michaï¿½ Soï¿½nicki
+ *    - Wojciech Szaï¿½apski (team leader)
  *
  ***********************************************/
 

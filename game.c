@@ -388,6 +388,9 @@ void startGame(void) {
 	//}
     printf("Wczytalem plansze, jestem z powrotem w game.c\n");
 
+	initDAC();
+	playBeginningSound();
+
     initAlpha();
 
     lcdClrscr();
@@ -456,8 +459,6 @@ void startGame(void) {
     } else {
         displayText("You won");
     }
-
-    playMusic();
 
     displayText("Init Bluetooth");
     initBluetooth();

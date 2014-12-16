@@ -72,6 +72,7 @@ CSRCS   = main.c        \
 		  pff.c			\
 		  diskio.c 		\
 		  sd.c			\
+		  music/beginning_sound.c
 
 # List assembler source files here
 ASRCS   = 
