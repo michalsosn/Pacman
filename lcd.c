@@ -149,8 +149,9 @@ void lcdClrscr(void) {
 
     lcdWrcmd(LCD_CMD_RAMWR); // write memory
 
-    for (i = 0; i < 16900; i++)
+    for (i = 0; i < 16900; i++) {
         lcdWrdata(bkgColor);
+    }
 
     // deselect controller
     selectLCD(FALSE);
@@ -205,8 +206,9 @@ void lcdRect(tU8 x, tU8 y, tU8 xLen, tU8 yLen, tU8 color) {
     lcdWrcmd(LCD_CMD_RAMWR); // write memory
 
     len = xLen * yLen;
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len; i++) {
         lcdWrdata(color);
+    }
 
     //deselect controller
     selectLCD(FALSE);
