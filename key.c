@@ -46,7 +46,6 @@ static tU8 keyLeftReleased = TRUE;
 static tU8 keyRightReleased = TRUE;
 
 static volatile tU8 activeKey = KEY_NOTHING;
-static volatile tU8 activeKey2 = KEY_NOTHING;
 
 static tU8 keyProcStack[KEYPROC_STACK_SIZE];
 static tU8 keyProcPid;
@@ -167,7 +166,7 @@ static void procKey(void *arg) {
     // make all key signals as inputs
     IODIR &= ~(KEYPIN_CENTER | KEYPIN_UP | KEYPIN_DOWN | KEYPIN_LEFT | KEYPIN_RIGHT);
 
-    //sample keys each 50 ms
+    // sample keys each 50 ms
     while (1) {
         sampleKey();
         osSleep(5);
