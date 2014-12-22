@@ -4,11 +4,11 @@
 
 #ifndef _DISKIO
 
-#include "integer.h"
+#include "pre_emptive_os/api/general.h"
 
 
 /* Status of Disk Functions */
-typedef BYTE	DSTATUS;
+typedef tU8	DSTATUS;
 
 
 /* Results of Disk Functions */
@@ -24,8 +24,7 @@ typedef enum {
 /* Prototypes for disk control functions */
 
 DSTATUS disk_initialize (void);
-DRESULT disk_readp (BYTE*, DWORD, WORD, WORD);
-DRESULT disk_writep (BYTE*, DWORD);
+DRESULT disk_readp (tU8*, tU32, tU16, tU16);
 
 #define STA_NOINIT		0x01	/* Drive not initialized */
 #define STA_NODISK		0x02	/* No medium in the drive */

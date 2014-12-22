@@ -5,10 +5,10 @@
 
 
 //komentarze po angielsku, takie zrobi³em na pocz¹tku nie bêde t³umaczyæ
-CHAR sdInit(void){
+tS8 sdInit(void){
 
-	SHORT i;
-	BYTE resp;
+	tU16 i;
+	tU8 resp;
 
 	/* Try to send reset command up to 100 times */
 	i = 100;
@@ -16,14 +16,14 @@ CHAR sdInit(void){
 		sdCommand(0, 0, 0);
 		resp = sdResp8b();
 	}
-	while(resp!=1 && i--);
+	while(1 != resp && i--);
 
-	if( resp != 1){
-		if(resp == 0xff){
-			return(-1);
+	if(1 != resp){
+		if(0xff == resp){
+			return -1;
 		}else{
 			sdResp8bError(resp);
-			return(-2);
+			return -2;
 		}
 	}
 
@@ -34,29 +34,30 @@ CHAR sdInit(void){
 		sdCommand(1, 0, 0);
 
 		resp = sdResp8b();
-		if(resp!=0)
+		if (0 != resp) {
 			sdResp8bError(resp);
-	}while(resp == 1 && i--);
+		}
+	}while(1 == resp && i--);
 
-	if( resp != 0){
+	if (0 != resp) {
 		sdResp8bError(resp);
-		return(-3);
+		return -3;
 	}
 
 	return(0);
 
 }
 
-void sdCommand(BYTE cmd, WORD paramx, WORD paramy){
+void sdCommand(tU8 cmd, tU16 paramx, tU16 paramy){
 	SELECT_CARD();
 
 	spiSend(0xff);
 
 	spiSend(0x40 | cmd);
-	spiSend((BYTE) (paramx >> 8)); /* MSB of parameter x */
-	spiSend((BYTE) (paramx)); /* LSB of parameter x */
-	spiSend((BYTE) (paramy >> 8)); /* MSB of parameter y */
-	spiSend((BYTE) (paramy)); /* LSB of parameter y */
+	spiSend((tU8) (paramx >> 8)); /* MSB of parameter x */
+	spiSend((tU8) (paramx)); /* LSB of parameter x */
+	spiSend((tU8) (paramy >> 8)); /* MSB of parameter y */
+	spiSend((tU8) (paramy)); /* LSB of parameter y */
 
 	spiSend(0x95); /* Checksum (should be only valid for first command (0) */
 
@@ -66,14 +67,13 @@ void sdCommand(BYTE cmd, WORD paramx, WORD paramy){
 
 }
 
-BYTE i;
-BYTE resp8b;
-
-BYTE sdResp8b(void) {
+tU8 sdResp8b(void) {
+    tU8 i;
+    tU8 resp8b;
 
 	SELECT_CARD();
 	/* Respone will come after 1 - 8 pings */
-	for(i=0;i<8;i++){
+	for(i=0; i<8; i++){
 		resp8b = spiSend(0xff);
 		if(resp8b != 0xff)
 			return(resp8b);
@@ -82,8 +82,8 @@ BYTE sdResp8b(void) {
 	return(resp8b);
 }
 
-WORD resp16;
-WORD sdResp16b(void){
+tU16 sdResp16b(void){
+    tU16 resp16;
 
 	SELECT_CARD();
 	resp16 = ( sdResp8b() << 8 ) & 0xff00;
@@ -91,10 +91,10 @@ WORD sdResp16b(void){
 	SELECT_CARD();
 	resp16 |= spiSend(0xff);
 	UNSELECT_CARD();
-	return(resp16);
+	return (resp16);
 }
 
-void sdResp8bError(BYTE value){
+void sdResp8bError(tU8 value){
 	switch(value){
 		case 0x40:
 			printf("Argument out of bounds.\n");
@@ -123,8 +123,8 @@ void sdResp8bError(BYTE value){
 	}
 }
 
-CHAR sdState(void){
-	WORD value;
+tS8 sdState(void){
+	tU16 value;
 
 	sdCommand(13, 0, 0);
 	value = sdResp16b();
@@ -158,11 +158,11 @@ CHAR sdState(void){
 			printf("Out of Range, CSD_Overwrite.\n");
 			break;
 		default:
-			if(value>0x00FF)
-				sdResp8bError((BYTE) (value>>8));
+			if(value > 0x00FF)
+				sdResp8bError((tU8) (value >> 8));
 			else
 				printf("Unknown error: 0x%x (see SanDisk docs).\n",value);
 			break;
 	}
-	return(-1);
+	return -1;
 }

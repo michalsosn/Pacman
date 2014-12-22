@@ -13,27 +13,16 @@
 /*-----------------------------------------------------------------------*/
 
 DSTATUS disk_initialize (void){
-
-	//DSTATUS stat;
-
 	initSpi(); /*init at low speed */
 
-	
-	if( sdInit() < 0 ) {
-#ifdef DEBUG
-		printf("Card failed to init, breaking up...\n");
-#endif
+	if(sdInit() < 0) {
 		return STA_NOINIT;
 	}
 
-	if( sdState() < 0 ){
-#ifdef DEBUG
-		printf("Card didn't return the ready state, breaking up...\n");
-#endif
+	if(sdState() < 0) {
 		return STA_NOREADY;
 	}
 
-	//sdgetDriveSize();
 	setSpiSpeed(8);
 	return 0;
 }
@@ -44,18 +33,18 @@ DSTATUS disk_initialize (void){
 /* Read Partial Sector                                                   */
 /*-----------------------------------------------------------------------*/
 
-BYTE cardresp;
-BYTE firstblock;
-BYTE c;
-WORD fb_timeout=0xffff;
-DWORD i;
-DWORD place;
+tU8 cardresp;
+tU8 firstblock;
+tU8 c;
+tU16 fb_timeout=0xffff;
+tU32 i;
+tU32 place;
 
 DRESULT disk_readp (
-	BYTE* dest,			/* Pointer to the destination object */
-	DWORD sector,		/* Sector number (LBA) */
-	WORD sofs,			/* Offset in the sector */
-	WORD count			/* Byte count (bit15:destination) */
+	tU8* dest,			/* Pointer to the destination object */
+	tU32 sector,		/* Sector number (LBA) */
+	tU16 sofs,			/* Offset in the sector */
+	tU16 count			/* tU8 count (bit15:destination) */
 )
 {
 	DRESULT res;
@@ -71,7 +60,7 @@ DRESULT disk_readp (
 	i = 0;
 
 	place = 512*(sector);
-	sdCommand(CMDREAD, (WORD) (place >> 16), (WORD) place);
+	sdCommand(CMDREAD, (tU16) (place >> 16), (tU16) place);
 
 	cardresp = sdResp8b(); /* Card response */
 
@@ -101,7 +90,7 @@ DRESULT disk_readp (
 	}
 
 
-	/* Checksum (2 byte) - ignore for now */
+	/* Checksum (2 tU8) - ignore for now */
 	spiSend(0xff);
 	spiSend(0xff);
 UNSELECT_CARD();
@@ -109,37 +98,3 @@ UNSELECT_CARD();
 
 	return res;
 }
-
-
-
-/*-----------------------------------------------------------------------*/
-/* Write Partial Sector                                                  */
-/*-----------------------------------------------------------------------*/
-
-DRESULT disk_writep (
-	BYTE* buff,		/* Pointer to the data to be written, NULL:Initiate/Finalize write operation */
-	DWORD sc		/* Sector number (LBA) or Number of bytes to send */
-)
-{
-	DRESULT res = RES_OK;
-
-
-	if (!buff) {
-		if (sc) {
-
-			// Initiate write process
-
-		} else {
-
-			// Finalize write process
-
-		}
-	} else {
-
-		// Send data to the disk
-
-	}
-
-	return res;
-}
-
