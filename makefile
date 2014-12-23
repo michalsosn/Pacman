@@ -6,13 +6,13 @@
 #
 ##########################################################
 
-# Name of target (executable program or library) 
+# Name of target (executable program or library)
 NAME      = pacman
 
 # Link program to RAM or ROM (possible values for LD_RAMROM is RAM or ROM,
 # if not specified = ROM)
 # Get value from parent makefile instead
-#LD_RAMROM = ROM 
+#LD_RAMROM = ROM
 
 # Name if specific CPU used (used by linker scripts to define correct memory map)
 # Valid CPUs are: LPC2101, LPC2102, LPC2103, LPC2104, LPC2105, LPC2106
@@ -30,7 +30,7 @@ CPU_VARIANT = LPC2148
 # It is possible to override the automatic linker file selection with the variable below.
 # No not use this opion unless you have very specific needs.
 #LD_SCRIPT = build_files/myOwnLinkScript_rom.ld
-LD_SCRIPT_PATH = 
+LD_SCRIPT_PATH =
 
 # ELF-file contains debug information, or not
 # (possible values for DEBUG are 0 or 1)
@@ -71,13 +71,12 @@ CSRCS   = main.c        \
 		  spi.c			\
 		  pff.c			\
 		  diskio.c 		\
-		  sd.c			\
 		  music/beginning_sound.c
 
 # List assembler source files here
-ASRCS   = 
+ASRCS   =
 
-# List subdirectories to recursively invoke make in 
+# List subdirectories to recursively invoke make in
 SUBDIRS = startup
 
 # List additional libraries to link with
