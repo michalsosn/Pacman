@@ -50,26 +50,26 @@
 /  performance and code efficiency. */
 #define _WORD_ACCESS	0
 
-/* File status flag (FATFS.flag) */
+//File status flag (FATFS.flag)
 
 #define	FA_OPENED	0x01
 #define	FA_WPRT		0x02
 #define	FA__WIP		0x40
 
-/* FAT sub type (FATFS.fs_type) */
+//FAT sub type (FATFS.fs_type)
 
 #define FS_FAT32	3
 
-/* File attribute bits for directory entry */
+//File attribute bits for directory entry
 
-#define	AM_RDO	0x01	/* Read only */
-#define	AM_HID	0x02	/* Hidden */
-#define	AM_SYS	0x04	/* System */
-#define	AM_VOL	0x08	/* Volume label */
-#define AM_LFN	0x0F	/* LFN entry */
-#define AM_DIR	0x10	/* Directory */
-#define AM_ARC	0x20	/* Archive */
-#define AM_MASK	0x3F	/* Mask of defined bits */
+#define	AM_RDO	0x01	// Read only
+#define	AM_HID	0x02	// Hidden
+#define	AM_SYS	0x04	// System
+#define	AM_VOL	0x08	// Volume label
+#define AM_LFN	0x0F	// LFN entry
+#define AM_DIR	0x10	// Directory
+#define AM_ARC	0x20	// Archive
+#define AM_MASK	0x3F	// Mask of defined bits
 
 
 /* FatFs refers the members in the FAT structures with byte offset instead
@@ -123,23 +123,23 @@
 #define	DIR_FstClusLO		26
 #define	DIR_FileSize		28
 
-/* Multi-byte word access macros  */
+//Multi-byte word access macros
 
 #define	LD_WORD(ptr)		(tU16)(((tU16)*(tU8*)((ptr)+1)<<8)|(tU16)*(tU8*)(ptr))
 #define	LD_DWORD(ptr)		(tU32)(((tU32)*(tU8*)((ptr)+3)<<24)|((tU32)*(tU8*)((ptr)+2)<<16)|((tU16)*(tU8*)((ptr)+1)<<8)|*(tU8*)(ptr))
 #define	ST_WORD(ptr,val)	*(tU8*)(ptr)=(tU8)(val); *(tU8*)((ptr)+1)=(tU8)((tU16)(val)>>8)
 #define	ST_DWORD(ptr,val)	*(tU8*)(ptr)=(tU8)(val); *(tU8*)((ptr)+1)=(tU8)((tU16)(val)>>8); *(tU8*)((ptr)+2)=(tU8)((tU32)(val)>>16); *(tU8*)((ptr)+3)=(tU8)((tU32)(val)>>24)
 
-/* Character code support macros */
+//Character code support macros
 
 #define IsUpper(c)	(((c)>='A')&&((c)<='Z'))
 #define IsLower(c)	(((c)>='a')&&((c)<='z'))
 
-/* */
+//
 #define IsDBCS1(c)	0
 #define IsDBCS2(c)	0
 
-/* */
+//
 #define	CLUST	tU32
 
 
@@ -148,56 +148,56 @@
 /*********/
 
 
-/* File system object structure */
+//File system object structure
 typedef struct _FATFS_ {
-	tU8	fs_type;	/* FAT sub type */
-	tU8	csize;		/* Number of sectors per cluster */
-	tU8	flag;		/* File status flags */
-	tU8	csect;		/* File sector address in the cluster */
-	tU16	n_rootdir;	/* Number of root directory entries (0 on FAT32) */
-	tU8*	buf;		/* Pointer to the disk access buffer */
-	CLUST	max_clust;	/* Maximum cluster# + 1. Number of clusters is max_clust - 2 */
-	tU32	fatbase;	/* FAT start sector */
-	tU32	dirbase;	/* Root directory start sector (Cluster# on FAT32) */
-	tU32	database;	/* Data start sector */
-	tU32	fptr;		/* File R/W pointer */
-	tU32	fsize;		/* File size */
-	CLUST	org_clust;	/* File start cluster */
-	CLUST	curr_clust;	/* File current cluster */
-	tU32	dsect;		/* File current data sector */
+	tU8	fs_type;	    // FAT sub type
+	tU8	csize;		    // Number of sectors per cluster
+	tU8	flag;		    // File status flags
+	tU8	csect;		    // File sector address in the cluster
+	tU16	n_rootdir;	// Number of root directory entries (0 on FAT32)
+	tU8*	buf;		// Pointer to the disk access buffer
+	CLUST	max_clust;	// Maximum cluster# + 1. Number of clusters is max_clust - 2
+	tU32	fatbase;	// FAT start sector
+	tU32	dirbase;	// Root directory start sector (Cluster# on FAT32)
+	tU32	database;	// Data start sector
+	tU32	fptr;		// File R/W pointer
+	tU32	fsize;		// File size
+	CLUST	org_clust;	// File start cluster
+	CLUST	curr_clust;	// File current cluster
+	tU32	dsect;		// File current data sector
 } FATFS;
 
 
-/* Directory object structure */
+//Directory object structure
 typedef struct _DIR_ {
-	tU16	index;		/* Current read/write index number */
-	tU8*	fn;			/* Pointer to the SFN (in/out) {file[8],ext[3],status[1]} */
-	CLUST	sclust;		/* Table start cluster (0:Static table) */
-	CLUST	clust;		/* Current cluster */
-	tU32	sect;		/* Current sector */
+	tU16	index;		// Current read/write index number
+	tU8*	fn;			// Pointer to the SFN (in/out) {file[8],ext[3],status[1]}
+	CLUST	sclust;		// Table start cluster (0:Static table)
+	CLUST	clust;		// Current cluster
+	tU32	sect;		// Current sector
 } DIR;
 
 
-/* File status structure */
+//File status structure
 typedef struct _FILINFO_ {
-	tU32	fsize;		/* File size */
-	tU16	fdate;		/* Last modified date */
-	tU16	ftime;		/* Last modified time */
-	tU8	fattrib;	/* Attribute */
-	char	fname[13];	/* File name */
+	tU32	fsize;		// File size
+	tU16	fdate;		// Last modified date
+	tU16	ftime;		// Last modified time
+	tU8	fattrib;	    // Attribute
+	char	fname[13];	// File name
 } FILINFO;
 
 
-/* File function return code (FRESULT) */
+// File function return code (FRESULT)
 typedef enum {
-	FR_OK = 0,			/* 0 */
-	FR_DISK_ERR,		/* 1 */
-	FR_NOT_READY,		/* 2 */
-	FR_NO_FILE,			/* 3 */
-	FR_NO_PATH,			/* 4 */
-	FR_NOT_OPENED,		/* 5 */
-	FR_NOT_ENABLED,		/* 6 */
-	FR_NO_FILESYSTEM	/* 7 */
+	FR_OK = 0,
+	FR_DISK_ERR,
+	FR_NOT_READY,
+	FR_NO_FILE,
+	FR_NO_PATH,
+	FR_NOT_OPENED,
+	FR_NOT_ENABLED,
+	FR_NO_FILESYSTEM
 } FRESULT;
 
 
@@ -206,13 +206,13 @@ typedef enum {
 /*************/
 
 
-/* Mount/Unmount a logical drive */
-FRESULT pf_mount (FATFS*);
+//Mount/Unmount a logical drive
+FRESULT pf_mount(FATFS*);
 
-/* Open a file */
-FRESULT pf_open (const char*);
+//Open a file
+FRESULT pf_open(const char*);
 
-/* Read data from the open file */
-FRESULT pf_read (void*, tU16, tU16*);
+//Read data from the open file
+FRESULT pf_read(tU8*, tU16, tU16*);
 
 #endif

@@ -34,45 +34,69 @@
 #define	CMDWRITE	24
 #define	CMDREADCSD	9
 
+/* Card type flags (CardType) */
+#define CT_MMC				0x01	/* MMC ver 3 */
+#define CT_SD1				0x02	/* SD ver 1 */
+#define CT_SD2				0x04	/* SD ver 2 */
+#define CT_SDC				(CT_SD1|CT_SD2)	/* SD */
+#define CT_BLOCK			0x08	/* Block addressing */
+
 
 /*************/
 /* Functions */
 /*************/
 
 
-static tS8 sdInit(void);
-static tS8 sdState(void);
-static void sdCommand(tU8 cmd, tU16 paramx, tU16 paramy);
+static tU8 sdInit(void);
+static tU8 sdState(void);
+static void sdCommand(tU8 cmd, tU32 param);
 static tU8 sdResp8b(void);
 static void sdResp8bError(tU8 value);
 static tU16 sdResp16b(void);
 
-DSTATUS disk_initialize(void) {
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Initializes SD card
+ *
+ * Returns:
+ *      tU8 - TRUE, if initialization succeeded, FALSE otherwise
+ ****************************************************************************/
+tU8 disk_initialize(void) {
 	initSpi(); /*init at low speed */
 
-	if(sdInit() < 0) {
-		return STA_NOINIT;
+	if(sdInit() == FALSE) {
+		return FALSE;
 	}
 
-	if(sdState() < 0) {
-		return STA_NOREADY;
+	if(sdState() == FALSE) {
+		return FALSE;
 	}
 
 	setSpiSpeed(8);
-	return 0;
+	return TRUE;
 }
 
-/*-----------------------------------------------------------------------*/
-/* Read Partial Sector                                                   */
-/*-----------------------------------------------------------------------*/
-/* Pointer to the destination object */
-/* Sector number (LBA) */
-/* Offset in the sector */
-/* tU8 count (bit15:destination) */
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Reads part of sector with given number.
+ *
+ * Params:
+ *      [out] dest - pointer to the buffer for read data
+ *      [in] sector - number of sector to be read from
+ *      [in] count - number of bytes to be read
+ *
+ * Returns:
+ *      DRESULT - result of operation, RES_OK if it succeeded,
+ *                RES_ERR in case of error
+ ****************************************************************************/
 DRESULT disk_readp(tU8* dest, tU32 sector, tU16 sofs, tU16 count) {
 	DRESULT res;
 	//potrzebne by dzia³a³o z ekranem
-	setSpiSpeed(8);
+	//setSpiSpeed(8);
 
 	tU8 cardresp = 0;
 	tU8 firstblock = 0;
@@ -82,7 +106,7 @@ DRESULT disk_readp(tU8* dest, tU32 sector, tU16 sofs, tU16 count) {
 
 	tU32 place = 512*(sector);
 
-	sdCommand(CMDREAD, (tU16) (place >> 16), (tU16) place);
+	sdCommand(CMDREAD, place);
 
 	cardresp = sdResp8b(); /* Card response */
 
@@ -119,69 +143,97 @@ DRESULT disk_readp(tU8* dest, tU32 sector, tU16 sofs, tU16 count) {
 	return res;
 }
 
-static tS8 sdInit(void){
+/*****************************************************************************
+ *
+ * Description:
+ *      Low level function responsible for initializing SD card.
+ *
+ * Returns:
+ *      tU8 - TRUE if initialization was successful, FALSE otherwise
+ *
+ ****************************************************************************/
+static tU8 sdInit() {
 
 	tU16 i;
 	tU8 resp = 0;
 
 	/* Try to send reset command up to 100 times */
-	i = 100;
-	while (resp != 1 && i > 0) {
-		sdCommand(0, 0, 0);
+	i = 0;
+	while (resp != 1 && i < 100) {
+		sdCommand(0, 0);
 		resp = sdResp8b();
-		i--;
+		i++;
 	}
 
 	if(1 != resp){
 		if(0xff == resp){
-			return -1;
-		}else{
+			return FALSE;
+		} else {
 			sdResp8bError(resp);
-			return -2;
+			return FALSE;
 		}
 	}
 
 	/* Wait till card is ready initialising (returns 0 on CMD1) */
 	/* Try up to 32000 times. */
-	i = 32000;
-	while (1 == resp && i > 0) {
-		sdCommand(1, 0, 0);
+	i = 0;
+	while (1 == resp && i < 32000) {
+		sdCommand(1, 0);
 		resp = sdResp8b();
 
 		if (resp != 0) {
 			sdResp8bError(resp);
 		}
 
-		i--;
+		i++;
 	}
 
 	if (resp != 0) {
 		sdResp8bError(resp);
-		return -3;
+		return FALSE;
 	}
 
-	return 0;
+	return TRUE;
 }
 
-static void sdCommand(tU8 cmd, tU16 paramx, tU16 paramy){
+/*****************************************************************************
+ *
+ * Description:
+ *      Sends specified command to SD card.
+ *
+ * Params:
+ *      [in] cmd - command to be sent
+ *      [in] param - command parameter
+ *
+ ****************************************************************************/
+static void sdCommand(tU8 cmd, tU32 param){
 	SELECT_CARD();
 	spiSend(0xff);
 
 	spiSend(0x40 | cmd);
-	spiSend((tU8) (paramx >> 8)); /* MSB of parameter x */
-	spiSend((tU8) (paramx)); /* LSB of parameter x */
-	spiSend((tU8) (paramy >> 8)); /* MSB of parameter y */
-	spiSend((tU8) (paramy)); /* LSB of parameter y */
+	spiSend((tU8) (param >> 24)); /* MSB of first word of parameter */
+	spiSend((tU8) (param >> 16)); /* LSB of first word of parameter */
+	spiSend((tU8) (param >> 8)); /* MSB of second word of parameter */
+	spiSend((tU8) (param)); /* LSB of second word of parameter */
 
 	spiSend(0x95); /* Checksum (should be only valid for first command (0) */
 
 	spiSend(0xff); /* eat empty command - response */
 
 	UNSELECT_CARD();
-
 }
 
-static tU8 sdResp8b(void) {
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Gets card's response for sent command. Its size is 1B.
+ *
+ * Returns:
+ *      tU8 - card's response
+ *
+ ****************************************************************************/
+static tU8 sdResp8b() {
     tU8 i;
     tU8 resp8b;
 
@@ -197,7 +249,17 @@ static tU8 sdResp8b(void) {
 	return resp8b;
 }
 
-static tU16 sdResp16b(void){
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Gets card's response for sent command. Its size is 2B.
+ *
+ * Returns:
+ *      tU16 - card's response
+ *
+ ****************************************************************************/
+static tU16 sdResp16b(){
     tU16 resp16;
 
 	SELECT_CARD();
@@ -209,6 +271,17 @@ static tU16 sdResp16b(void){
 	return (resp16);
 }
 
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Function used for debugging purposes. Prints information about error
+ *      based on the error message received from card.
+ *
+ * Params:
+ *      [in] value - error message received from card
+ *
+ ****************************************************************************/
 static void sdResp8bError(tU8 value){
 	switch(value){
 		case 0x40:
@@ -238,15 +311,26 @@ static void sdResp8bError(tU8 value){
 	}
 }
 
-static tS8 sdState(void){
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Returns information about card state and
+ *      prints information about errors if they occurred.
+ *
+ * Returns:
+ *      tU8 - FALSE if some errors occurred, TRUE otherwise
+ *
+ ****************************************************************************/
+static tU8 sdState(){
 	tU16 value;
 
-	sdCommand(13, 0, 0);
+	sdCommand(13, 0);
 	value = sdResp16b();
 
 	switch(value) {
 		case 0x000:
-			return(1);
+			return TRUE;
 			break;
 		case 0x0001:
 			printf("Card is Locked.\n");
@@ -280,5 +364,5 @@ static tS8 sdState(void){
 			}
 			break;
 	}
-	return -1;
+	return FALSE;
 }

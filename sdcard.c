@@ -1,13 +1,24 @@
-// sdcard.c
-// defines functions for initializing SD and reading pacman board
+/******************************************************************************
+ *
+ * File:
+ *    sdcard.c
+ *
+ * Description:
+ *    Contains definitions of functions responsible for
+ *    initializing SD and reading pacman board
+ *
+ *****************************************************************************/
+
 
 /************/
 /* Includes */
 /************/
 
+
 #include "pff.h"
 #include "startup/printf_P.h"
 #include "sdcard.h"
+
 
 /***********/
 /* Defines */
@@ -15,19 +26,31 @@
 
 #define BOARD_BUFFER_SIZE 500
 
+
 /*************/
 /* Variables */
 /*************/
+
 
 tU8 boardBuffer[BOARD_BUFFER_SIZE];
 tU32 result;
 FATFS fatfs;
 
+
 /*************/
 /* Functions */
 /*************/
 
-// Tries to init SD card
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Check if SD card is inserted and prepares it.
+ *
+ * Returns:
+ *      tU8 - TRUE if card initialization succeeded
+ *            FALSE if there is no card inserted or an I/O error occurred
+ ****************************************************************************/
 static tU8 findAndInitSD() {
 	result = pf_mount(&fatfs);
 	if (result) {
@@ -43,7 +66,20 @@ static tU8 findAndInitSD() {
 	return TRUE;
 }
 
-// Reads board from SD card.
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Reads Pacman board from SD card
+ *
+ * Params:
+ *      [out] board - pointer to the board object
+ *      [in] boardHeight - board height
+ *      [in] boardWidth - board width
+ *
+ * Returns:
+ *      tU8 - TRUE if operation ended successfully, FALSE otherwise
+ ****************************************************************************/
 tU8 readBoard(Field *board, tU8 boardHeight, tU8 boardWidth) {
 
 	tU8 initResult = findAndInitSD();
@@ -75,7 +111,7 @@ tU8 readBoard(Field *board, tU8 boardHeight, tU8 boardWidth) {
 		printf("Odczytano wszystkie dane z pliku.\n");
 	}
 
-	int i, j = 0;
+	tU32 i, j = 0;
 	for (i = 0; i < BOARD_BUFFER_SIZE && boardBuffer[i] != 0; ++i) {
 		if (boardBuffer[i] == '\n' || boardBuffer[i] == '\r') {
 			continue;

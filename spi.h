@@ -7,7 +7,7 @@
  *
  * Description:
  *    Contains declarations of functions responsible for handling
- *    communication via SPI.
+ *    communication with SD card via SPI.
  *
  *****************************************************************************/
 
@@ -62,13 +62,13 @@
 /* Functions */
 /*************/
 
-//inicjuj SPI
+//initis SPI
 void initSpi(void);
 
-//ustaw prêdkoœæ SPI
+//sets SPI speed
 void setSpiSpeed(tU8 speed);
 
-//wyœlij coœ na SPI
+//sends data via SPI
 tU8 spiSend(tU8 toSend);
 
 

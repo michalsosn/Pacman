@@ -25,6 +25,12 @@
 /*************/
 
 
+/*****************************************************************************
+ *
+ * Description:
+ *      Initializes SPI to work with SD cards
+ *
+ ****************************************************************************/
 void initSpi(void){
 	// setup GPIO
 	SPI_IODIR |= (1 << SPI_SCK_PIN) | (1 << SPI_MOSI_PIN) | (1 << SPI_SS_PIN);
@@ -53,6 +59,16 @@ void initSpi(void){
 
 }
 
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Sets SPI speed.
+ *
+ * Params:
+ *      [in] speed - speed to set
+ *
+ ****************************************************************************/
 void setSpiSpeed(tU8 speed){
 	speed &= 0xFE;
 	if ( speed < SPI_PRESCALE_MIN  )
@@ -61,6 +77,19 @@ void setSpiSpeed(tU8 speed){
 	SPI_PRESCALE_REG = speed;
 }
 
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Sends data via SPI and returns response.
+ *
+ * Params:
+ *      [in] toSend - data to be sent
+ *
+ * Returns:
+ *      tU8 - data coming as response
+ *
+ ****************************************************************************/
 tU8 spiSend(tU8 toSend){
     tU8 incoming = 0;
 
