@@ -14,7 +14,7 @@
  ***********************************************/
 
 // main.c
-// Reponsible for initialization and creating application processes.
+// Responsible for initialization and creating application processes.
 
 /************/
 /* Includes */

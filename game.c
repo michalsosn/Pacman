@@ -4,7 +4,7 @@
  *    game.h
  * 
  * Description:
- *    Reponsible for the interface between game logic and hardware.
+ *    Responsible for the interface between game logic and hardware.
  *
  *****************************************************************************/
 

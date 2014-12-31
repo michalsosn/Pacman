@@ -4,7 +4,7 @@
  *    pacman.c
  * 
  * Description:
- *    Reponsible for game logic
+ *    Responsible for game logic
  *
  *****************************************************************************/
 

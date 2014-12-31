@@ -4,7 +4,7 @@
  *    pacman.h
  * 
  * Description:
- *    Reponsible for game logic
+ *    Responsible for game logic
  *
  *****************************************************************************/
 #ifndef _PACMAN_H_
@@ -14,7 +14,6 @@
 /* Includes */
 /************/
 
-//#include "pre_emptive_os/api/osapi.h"
 #include "pre_emptive_os/api/general.h"
 
 /***********/
