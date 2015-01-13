@@ -31,7 +31,7 @@ void setRGBLedColor(tU8 r, tU8 g, tU8 b) {
     PWM_MR4 = b * 4096 / 255; // Pulse duration (P0.8) blue
     PWM_MR6 = g * 4096 / 255; // Pulse duration (P0.9) green
     PWM_LER = 0x55; // Latch Enable Register - Allows the last value written to the PWMMR0, PWMMR2, PWMMR4, PWMMR6 registers to be become effective when the timer is next reset by a PWM Match event.
-    PWM_PCR = 0x5400; // Prescale Counter Register - PWMENA2, PWMENA4, PWMENA6 - Enable output PWM2, PWM4, PWM6, disable others
+    PWM_PCR = 0x5400; // Prescale Counter Register - PWMENA2, PWMENA4, PWMENA6 - Enable output PWM2, PWM4, PWM6, disable others, set single-edge controled mode
     PWM_TCR = 0x09; // Counter Enable and PWM Enable
     //**********************************************************************************************************
 }

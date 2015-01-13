@@ -54,6 +54,8 @@ Field board[BOARD_HEIGHT][BOARD_WIDTH];
 static tU8 ghostEatingMode;
 static tU8 moveToInitPositions;
 
+static tU8 defaultBoardUsed;
+
 //game counters
 static tU8 level;
 static tU8 lives;
@@ -61,7 +63,7 @@ static tU8 score;
 static tU8 pointsToCompleteLevel;
 
 //seed for random function
-static tU8 seed;
+static tU16 seed;
 
 /************/
 /* Handlers */
@@ -96,10 +98,10 @@ static void generateSeed() {
  *    Generates pseudo random number
  *
  * Returns:
- *    tU8 - pseudo random number
+ *    tU16 - pseudo random number
  *
  ****************************************************************************/
-static tU8 random() {
+static tU16 random() {
     seed = (seed * 1103515245 + 12345) % 2147483647;
     return seed;
 }
@@ -144,8 +146,12 @@ inline static Coordinates calculateMove(Coordinates coords, Direction dir) {
  *
  ****************************************************************************/
 inline static tU8 canMove(Coordinates coords, CharacterType type) {
-    if (board[coords.y][coords.x] == WALL) return FALSE;
-    if (board[coords.y][coords.x] == DOORS && type == PACMAN) return FALSE;
+    if (WALL == board[coords.y][coords.x]) {
+        return FALSE;
+    }
+    if (PACMAN == type && DOORS == board[coords.y][coords.x]) {
+        return FALSE;
+    }
     return TRUE;
 }
 
@@ -281,6 +287,10 @@ static Direction defaultGoBackHome(Character *c) {
         return defaultExitHome(c);
     }
 
+    if(!defaultBoardUsed) {
+        return c->defaultUpdateDirection(c);
+    }
+
     if (7 == c->position.y) {
         switch (c->position.x) {
             case 3:
@@ -344,14 +354,19 @@ static Direction defaultGoBackHome(Character *c) {
  ****************************************************************************/
 static Direction defaultGhostMovement(Character *c) {
     if (10 == c->position.x && 6 == c->position.y) {
-        return RIGHT;
+        if(LEFT == c->currentDirection) {
+            return LEFT;
+		}
+		return RIGHT;
     }
-    Direction ranDir;
+    Direction ranDir = random() % 4;
     Coordinates coords;
+	int canGoBack = FALSE;
     do {
-        ranDir = random() % 3;
-        if (c->currentDirection == turnBack(ranDir)) {
-            ranDir = 3;
+        ranDir = (ranDir + 1) % 4;
+        if (c->currentDirection == turnBack(ranDir) && !canGoBack) {
+            ranDir++;
+			canGoBack = TRUE;
         }
         coords = calculateMove(c->position, ranDir);
     } while (!canMove(coords, c->type));
@@ -389,10 +404,10 @@ int calculatePointsToComplete() {
  *    [in] useDefaultBoard - value that specifies if default board should be used
  *
  ****************************************************************************/
-void initPacman(tU8 useDefaultBoard)
-{
+void initPacman(tU8 useDefaultBoard) {
 	printf("InitPacman rozpoczete\n");
-	if (useDefaultBoard == TRUE) {
+	defaultBoardUsed = useDefaultBoard;
+	if (useDefaultBoard) {
 		int row, column;
 		for (row = 0; row < BOARD_HEIGHT; ++row) {
 			for (column = 0; column < BOARD_WIDTH; ++column) {
@@ -489,8 +504,7 @@ void initPacman(tU8 useDefaultBoard)
  *    [in] updateDirection - pointer to function to be used as a callback
  *
  ****************************************************************************/
-void setDirectionCallback(Direction (*updateDirection)(struct character *))
-{
+void setDirectionCallback(Direction (*updateDirection)(struct character *)) {
     pacman.updateDirection = updateDirection;
 }
 
@@ -504,8 +518,7 @@ void setDirectionCallback(Direction (*updateDirection)(struct character *))
  *    [in] updateDirection - pointer to function to be used as a callback
  *
  ****************************************************************************/
-void setGhostDirectionCallback(tU8 ghost, Direction (*updateDirection)(struct character *))
-{
+void setGhostDirectionCallback(tU8 ghost, Direction (*updateDirection)(struct character *)) {
     if (ghost < NUMBER_OF_GHOSTS) {
         ghosts[ghost].updateDirection = updateDirection;
     }
@@ -520,8 +533,7 @@ void setGhostDirectionCallback(tU8 ghost, Direction (*updateDirection)(struct ch
  *    [in] handler - pointer to function to be used as a callback
  *
  ****************************************************************************/
-void onGameLost(void (*handler)(tU8, tU8))
-{
+void onGameLost(void (*handler)(tU8, tU8)) {
     handleGameLost = handler;
 }
 
@@ -534,8 +546,7 @@ void onGameLost(void (*handler)(tU8, tU8))
  *    [in] handler - pointer to function to be used as a callback
  *
  ****************************************************************************/
-void onLifeLost(void (*handler)(tU8))
-{
+void onLifeLost(void (*handler)(tU8)) {
     handleLifeLost = handler;
 }
 
@@ -548,8 +559,7 @@ void onLifeLost(void (*handler)(tU8))
  *    [in] handler - pointer to function to be used as a callback
  *
  ****************************************************************************/
-void onScoreChanged(void (*handler)(tU8))
-{
+void onScoreChanged(void (*handler)(tU8)) {
     handleScoreChanged = handler;
 }
 
@@ -562,8 +572,7 @@ void onScoreChanged(void (*handler)(tU8))
  *    [in] handler - pointer to function to be used as a callback
  *
  ****************************************************************************/
-void onLevelCompleted(void (*handler)(tU8, tU8))
-{
+void onLevelCompleted(void (*handler)(tU8, tU8)) {
     handleLevelComplete = handler;
 }
 
@@ -576,8 +585,7 @@ void onLevelCompleted(void (*handler)(tU8, tU8))
  *    [in] handler - pointer to function to be used as a callback
  *
  ****************************************************************************/
-void onGhostEaten(void (*handler)())
-{
+void onGhostEaten(void (*handler)()) {
     handleGhostEaten = handler;
 }
 
@@ -591,8 +599,7 @@ void onGhostEaten(void (*handler)())
  *    [in] handler - pointer to function to be used as a callback
  *
  ****************************************************************************/
-void onTimeToEatChanged(void (*handler)(tU8))
-{
+void onTimeToEatChanged(void (*handler)(tU8)) {
     handleTimeToEatChanged = handler;
 }
 
@@ -611,8 +618,7 @@ void onTimeToEatChanged(void (*handler)(tU8))
  *            of each move are equal.
  *
  ****************************************************************************/
-Move *makeMove()
-{
+Move *makeMove() {
     tU8 i;
     static Move moves[1 + NUMBER_OF_GHOSTS];
 
@@ -647,17 +653,25 @@ Move *makeMove()
                 ghosts[i].updateDirection = defaultGoBackHome;
                 ghosts[i].position = moves[i + 1].from;
                 moves[i + 1].to = moves[i + 1].from;
-                if (handleGhostEaten) handleGhostEaten();
+                if (handleGhostEaten) {
+                    handleGhostEaten();
+                }
                 score += POINTS_FOR_EATING;
-                if (handleScoreChanged) handleScoreChanged(score);
+                if (handleScoreChanged) {
+                    handleScoreChanged(score);
+                }
             } else {
                 moveToInitPositions = TRUE;
                 lives--;
-                if (handleLifeLost) handleLifeLost(lives);
+                if (handleLifeLost) {
+                    handleLifeLost(lives);
+                }
                 for (i = 0; i < NUMBER_OF_GHOSTS; ++i) {
                     ghosts[i].type = GHOST;
                 }
-                if (0 == lives && handleGameLost) handleGameLost(level, score);
+                if (0 == lives && handleGameLost) {
+                    handleGameLost(level, score);
+                }
                 pacman.position = moves[0].from;
                 moves[0].to = moves[0].from;
                 break;
@@ -667,17 +681,25 @@ Move *makeMove()
             if (EATABLE_GHOST == ghosts[i].type) {
                 ghosts[i].type = EYES;
                 ghosts[i].updateDirection = defaultGoBackHome;
-                if (handleGhostEaten) handleGhostEaten();
+                if (handleGhostEaten) {
+                    handleGhostEaten();
+                }
                 score += POINTS_FOR_EATING;
-                if (handleScoreChanged) handleScoreChanged(score);
+                if (handleScoreChanged) {
+                    handleScoreChanged(score);
+                }
             } else {
                 moveToInitPositions = 1;
                 lives--;
-                if (handleLifeLost) handleLifeLost(lives);
+                if (handleLifeLost) {
+                    handleLifeLost(lives);
+                }
                 for (i = 0; i < NUMBER_OF_GHOSTS; ++i) {
                     ghosts[i].type = GHOST;
                 }
-                if (lives == 0 && handleGameLost) handleGameLost(level, score);
+                if (lives == 0 && handleGameLost) {
+                    handleGameLost(level, score);
+                }
                 break;
             }
         }
@@ -687,33 +709,39 @@ Move *makeMove()
         board[pacman.position.y][pacman.position.x] = EMPTY;
         score++;
         pointsToCompleteLevel--;
-        if (handleScoreChanged) handleScoreChanged(score);
+        if (handleScoreChanged) {
+            handleScoreChanged(score);
+        }
     } else if (BONUS == board[pacman.position.y][pacman.position.x]) {
         board[pacman.position.y][pacman.position.x] = EMPTY;
         score += POINTS_FOR_BONUS;
         ghostEatingMode = INIT_TIME_TO_EAT;
         for (i = 0; i < NUMBER_OF_GHOSTS; ++i) {
-            if (ghosts[i].type == GHOST) {
+            if (GHOST == ghosts[i].type) {
                 ghosts[i].type = EATABLE_GHOST;
             }
         }
-        if (handleScoreChanged) handleScoreChanged(score);
+        if (handleScoreChanged) {
+            handleScoreChanged(score);
+        }
     }
 
     if (ghostEatingMode) {
         ghostEatingMode--;
-        if (handleTimeToEatChanged) handleTimeToEatChanged(ghostEatingMode);
+        if (handleTimeToEatChanged){
+            handleTimeToEatChanged(ghostEatingMode);
+        }
         if (!ghostEatingMode) {
             for (i = 0; i < NUMBER_OF_GHOSTS; ++i) {
-                if (ghosts[i].type == EATABLE_GHOST) {
+                if (EATABLE_GHOST == ghosts[i].type) {
                     ghosts[i].type = GHOST;
                 }
             }
         }
     }
 
-    if (!pointsToCompleteLevel) {
-        if (handleLevelComplete) handleLevelComplete(level, score);
+    if (!pointsToCompleteLevel && handleLevelComplete) {
+        handleLevelComplete(level, score);
     }
 
     return moves;
