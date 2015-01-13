@@ -380,13 +380,12 @@ void startGame(void) {
     onTimeToEatChanged(displayTimeToEat);
 
     // initializes the game
-	//tU8 boardRead = readBoard(&(board[0][0]), BOARD_HEIGHT, BOARD_WIDTH);
-	//if (TRUE == boardRead) {
-	//	initPacman(FALSE);
-	//} else {
+	tU8 boardRead = readBoard(&(board[0][0]), BOARD_HEIGHT, BOARD_WIDTH);
+	if (TRUE == boardRead) {
+		initPacman(FALSE);
+	} else {
 		initPacman(TRUE);
-	//}
-    printf("Wczytalem plansze, jestem z powrotem w game.c\n");
+	}
 
     initAlpha();
 
