@@ -1,39 +1,13 @@
-/******************************************************************************
- * Annotation:
- *    This library has been adjusted to the needs of 'Pacman Project'.
- *
- * File:
- *    spi.h
- *
- * Description:
- *    Contains declarations of functions responsible for handling
- *    communication with SD card via SPI.
- *
- *****************************************************************************/
-
-
 #ifndef _SPI_H
 #define _SPI_H
 
-/************/
-/* Includes */
-/************/
-
-
-#include "pre_emptive_os/api/general.h"
+#include "integer.h"
 #include "startup/lpc2xxx.h"
-
-
-/***********/
-/* Defines */
-/***********/
-
 
 // SP0SPCR  Bit-Definitions
 #define CPHA    3
 #define CPOL    4
 #define MSTR    5
-
 // SP0SPSR  Bit-Definitions
 #define SPIF	7
 
@@ -55,21 +29,12 @@
 #define SELECT_CARD()   IOCLR0 = (1 << SPI_SS_PIN)
 #define UNSELECT_CARD()	IOSET0 = (1 << SPI_SS_PIN)
 
-#define SPI_INITIAL_SPEED 254
-
-
-/*************/
-/* Functions */
-/*************/
-
-//initis SPI
+//inicjuj SPI
 void initSpi(void);
-
-//sets SPI speed
-void setSpiSpeed(tU8 speed);
-
-//sends data via SPI
-tU8 spiSend(tU8 toSend);
+//ustaw prêdkoœæ SPI
+void setSpiSpeed(BYTE speed);
+//wyœlij coœ na SPI
+BYTE spiSend(BYTE toSend);
 
 
 #endif //_SPI_H

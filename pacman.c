@@ -54,6 +54,8 @@ Field board[BOARD_HEIGHT][BOARD_WIDTH];
 static tU8 ghostEatingMode;
 static tU8 moveToInitPositions;
 
+static tU8 defaultBoardUsed;
+
 //game counters
 static tU8 level;
 static tU8 lives;
@@ -280,6 +282,10 @@ static Direction defaultGoBackHome(Character *c) {
         c->updateDirection = defaultExitHome;
         return defaultExitHome(c);
     }
+	
+	if(!defaultBoardUsed) {
+	    return c->defaultUpdateDirection(c);
+	}
 
     if (7 == c->position.y) {
         switch (c->position.x) {
@@ -346,12 +352,14 @@ static Direction defaultGhostMovement(Character *c) {
     if (10 == c->position.x && 6 == c->position.y) {
         return RIGHT;
     }
-    Direction ranDir;
+    Direction ranDir = random() % 4;
     Coordinates coords;
+	tU8 canMoveBack = FALSE;
     do {
-        ranDir = random() % 3;
-        if (c->currentDirection == turnBack(ranDir)) {
-            ranDir = 3;
+        ranDir = (ranDir + 1) % 4;
+        if (c->currentDirection == turnBack(ranDir) && !canMoveBack) {
+            ranDir++;
+			canMoveBack = TRUE;
         }
         coords = calculateMove(c->position, ranDir);
     } while (!canMove(coords, c->type));
@@ -391,6 +399,7 @@ int calculatePointsToComplete() {
  ****************************************************************************/
 void initPacman(tU8 useDefaultBoard)
 {
+    defaultBoardUsed = useDefaultBoard;
 	printf("InitPacman rozpoczete\n");
 	if (useDefaultBoard == TRUE) {
 		int row, column;
