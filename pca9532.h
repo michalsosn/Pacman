@@ -1,13 +1,10 @@
 /******************************************************************************
  *
- * Copyright:
- *    (C) 2007 Embedded Artists AB
- *
  * File:
  *    pca9532.h
- *
+ * 
  * Description:
- *    Expose hardware specific routines
+ *    The library is responsible for controlling LEDs on PCA9532.
  *
  *****************************************************************************/
 #ifndef _PCA9532_H_
@@ -26,6 +23,5 @@
 
 tBool pca9532Init(void);
 void setPca9532Pin(tU8 pinNum, tU8 value);
-tU16 getPca9532Pin(void);
 
 #endif

@@ -1,13 +1,10 @@
 /******************************************************************************
  *
- * Copyright:
- *    (C) 2006 Embedded Artists AB
- *
  * File:
  *    pca9532.c
- *
+ * 
  * Description:
- *    Implements hardware specific routines
+ *    The library is responsible for controlling LEDs on PCA9532.
  *
  *****************************************************************************/
 
@@ -30,15 +27,13 @@
 /*****************************************************************************
  *
  * Description:
- *    Initialize the io-pins and find out if HW is ver 1.0 or ver 1.1
+ *    Initialize the io-pins.
+ * Returns:
+ *    TRUE if connection was successful, FALSE otherwise
  *
  ****************************************************************************/
 tBool pca9532Init(void) {
     tU8 initCommand[] = {0x12, 0x97, 0x80, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00};
-    //                                                         04 = LCD_RST# low
-    //                                                         10 = BT_RST# low
-
-    //initialize PCA9532
     if (I2C_CODE_OK == pca9532(initCommand, sizeof (initCommand), NULL, 0)) {
         return TRUE;
     } else {
@@ -46,6 +41,12 @@ tBool pca9532Init(void) {
     }
 }
 
+/*****************************************************************************
+ *
+ * Description:
+ *    Set value on selected pin
+ *
+ ****************************************************************************/
 void setPca9532Pin(tU8 pinNum, tU8 value) {
     tU8 command[] = {0x00, 0x00};
     tU8 regValue;
@@ -78,13 +79,4 @@ void setPca9532Pin(tU8 pinNum, tU8 value) {
     command[1] |= regValue;
 
     pca9532(command, sizeof (command), NULL, 0);
-}
-
-tU16 getPca9532Pin(void) {
-    tU8 command[] = {0x19};
-    tU8 regValue[3];
-
-    pca9532(command, 1, regValue, 3);
-
-    return (tU16) regValue[1] | ((tU16) regValue[2] << 8);
 }

@@ -70,42 +70,21 @@ typedef struct character {
 /* Extern variables */
 /********************/
 
-// Contains static elements of the board.
 extern Field board[BOARD_HEIGHT][BOARD_WIDTH];
 
 /*************/
 /* Functions */
 /*************/
 
-// Initializes game
 void initPacman(tU8 useDefaultBoard);
-
-// Registers function for changing pacman direction
 void setDirectionCallback(Direction (*updateDirection)(struct character *c));
-
-// Lets you replace default movement rules of ghosts
 void setGhostDirectionCallback(tU8 ghost, Direction (*updateDirection)(struct character *c));
-
-// Sets handler for game lost event
 void onGameLost(void (*handler)(tU8 level, tU8 score));
-
-// Sets handler for life lost event
 void onLifeLost(void (*handler)(tU8 lifes));
-
-// Sets handler for score changed event
 void onScoreChanged(void (*handler)(tU8 score));
-
-// Sets handler for time to eat changed event
 void onTimeToEatChanged(void (*handler)(tU8 remainingTime));
-
-// Sets handler for level complete event
 void onLevelCompleted(void (*handler)(tU8 level, tU8 score));
-
-// Sets handler for ghost eaten event
 void onGhostEaten(void (*handler)());
-
-// Calculates next positions of all characters,
-// Includes collision detection
-// Returns array of moves to display
 Move *makeMove();
+
 #endif

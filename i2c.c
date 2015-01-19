@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * File:
- *    i2c.h
+ *    i2c.c
  * 
  * Description:
  *    The library is responsible for communication over I2C.

@@ -286,10 +286,10 @@ static Direction defaultGoBackHome(Character *c) {
         c->updateDirection = defaultExitHome;
         return defaultExitHome(c);
     }
-	
-	if(!defaultBoardUsed) {
-	    return c->defaultUpdateDirection(c);
-	}
+    
+    if(!defaultBoardUsed) {
+        return c->defaultUpdateDirection(c);
+    }
 
     if(!defaultBoardUsed) {
         return c->defaultUpdateDirection(c);
@@ -360,17 +360,17 @@ static Direction defaultGhostMovement(Character *c) {
     if (10 == c->position.x && 6 == c->position.y) {
         if(LEFT == c->currentDirection) {
             return LEFT;
-		}
-		return RIGHT;
+        }
+        return RIGHT;
     }
     Direction ranDir = random() % 4;
     Coordinates coords;
-	tU8 canMoveBack = FALSE;
+    tU8 canMoveBack = FALSE;
     do {
         ranDir = (ranDir + 1) % 4;
         if (c->currentDirection == turnBack(ranDir) && !canMoveBack) {
             ranDir++;
-			canMoveBack = TRUE;
+            canMoveBack = TRUE;
         }
         coords = calculateMove(c->position, ranDir);
     } while (!canMove(coords, c->type));
@@ -387,16 +387,16 @@ static Direction defaultGhostMovement(Character *c) {
  *
  ****************************************************************************/
 int calculatePointsToComplete() {
-	int result = 0;
-	int i, j;
-	for (i = 0; i < BOARD_HEIGHT; ++i) {
-		for (j = 0; j < BOARD_WIDTH; ++j) {
-			if (board[i][j] == POINT) {
-				++result;
-			}
-		}
-	}
-	return result;
+    int result = 0;
+    int i, j;
+    for (i = 0; i < BOARD_HEIGHT; ++i) {
+        for (j = 0; j < BOARD_WIDTH; ++j) {
+            if (board[i][j] == POINT) {
+                ++result;
+            }
+        }
+    }
+    return result;
 }
 
 /*****************************************************************************
@@ -409,17 +409,17 @@ int calculatePointsToComplete() {
  *
  ****************************************************************************/
 void initPacman(tU8 useDefaultBoard) {
-	printf("InitPacman rozpoczete\n");
-	defaultBoardUsed = useDefaultBoard;
-	if (useDefaultBoard) {
-		int row, column;
-		for (row = 0; row < BOARD_HEIGHT; ++row) {
-			for (column = 0; column < BOARD_WIDTH; ++column) {
-				board[row][column] = defaultBoard[row][column];
-			}
-		}
-	}
-	printf("Plansza wczytana do odpowiedniej tablicy\n");
+    printf("InitPacman rozpoczete\n");
+    defaultBoardUsed = useDefaultBoard;
+    if (useDefaultBoard) {
+        int row, column;
+        for (row = 0; row < BOARD_HEIGHT; ++row) {
+            for (column = 0; column < BOARD_WIDTH; ++column) {
+                board[row][column] = defaultBoard[row][column];
+            }
+        }
+    }
+    printf("Plansza wczytana do odpowiedniej tablicy\n");
 
     ghostEatingMode = FALSE;
     moveToInitPositions = TRUE;
@@ -427,8 +427,8 @@ void initPacman(tU8 useDefaultBoard) {
     lives = INIT_LIVES;
     score = INIT_SCORE;
     seed = INIT_SEED;
-	
-	pointsToCompleteLevel = calculatePointsToComplete();
+    
+    pointsToCompleteLevel = calculatePointsToComplete();
 
     pacman.birthplace.x = 10;
     pacman.birthplace.y = 15;
@@ -437,10 +437,10 @@ void initPacman(tU8 useDefaultBoard) {
     pacman.position.x = 10;
     pacman.position.y = 15;
     pacman.type = PACMAN;
-	
-	if (!pacman.updateDirection) {
-		pacman.updateDirection = defaultGhostMovement;
-	}
+    
+    if (!pacman.updateDirection) {
+        pacman.updateDirection = defaultGhostMovement;
+    }
 
     ghosts[0].birthplace.x = 10;
     ghosts[0].birthplace.y = 6;
@@ -495,8 +495,8 @@ void initPacman(tU8 useDefaultBoard) {
     ghosts[3].defaultUpdateDirection = defaultGhostMovement;
 
     if (handleLifeLost) {
-		handleLifeLost(lives);
-	}
+        handleLifeLost(lives);
+    }
 }
 
 /*****************************************************************************
