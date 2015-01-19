@@ -134,25 +134,20 @@ tS8 eepromStartRead(tU8 devAddr, tU16 address) {
     return retCode;
 }
 
-//-------------------------------------------------------------
-// Random Read followed by sequential read
-//-------------------------------------------------------------
-// Receive buffer:
-// Byte 00: DeviceAddress R/Wn=0 (WRITE)
-////////// Byte 01: EEPROM Address MSB   (A14..A08)
-// Byte 02: EEPROM Address LSB   (A07..A00)
-// Byte 03: DeviceAddress R/Wn=1 (READ)
-// Byte 04 to 67: Buffer for data read from EEPROM
-//-------------------------------------------------------------
-//  Parameters:
-//      pRxData     A pointer to the receive buffer
-//      Length      The number of data bytes to receive
-//
-//  Returns:
-//      MA_OK or I2C status code
-//
-//-------------------------------------------------------------
-
+/******************************************************************************
+ *
+ * Description:
+ *    Read from LM75
+ *
+ * Params:
+ *    [in] address - device address
+ *    [in] pBuf - buffer for received data
+ *    [in] len - buffer length
+ *
+ * Returns:
+ *    I2C status code
+ *
+ *****************************************************************************/
 tS8 lm75Read(tU8 address, tU8* pBuf, tU16 len) {
     tS8 retCode = 0;
     tU8 status = 0;
@@ -203,12 +198,19 @@ tS8 lm75Read(tU8 address, tU8* pBuf, tU16 len) {
     return retCode;
 }
 
-/******************************************************************************
+ /******************************************************************************
  *
  * Description:
- *    Communicate with the PCA9532
- *    First pBuf/len = bytes to write
- *    Second pBuf2/len2 = bytes to read
+ *    Communicate with PCA9532
+ *
+ * Params:
+ *    [in] pBuf - buffer of bytes to write
+ *    [in] len - length of pBuf
+ *    [in] pBuf2 - buffer for received data
+ *    [in] len - length of pBuf2
+ *
+ * Returns:
+ *    I2C status code
  *
  *****************************************************************************/
 tS8 pca9532(tU8* pBuf, tU16 len, tU8* pBuf2, tU16 len2) {
