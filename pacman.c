@@ -63,7 +63,7 @@ static tU8 score;
 static tU8 pointsToCompleteLevel;
 
 //seed for random function
-static tU16 seed;
+static int seed;
 
 /************/
 /* Handlers */
@@ -286,6 +286,10 @@ static Direction defaultGoBackHome(Character *c) {
         c->updateDirection = defaultExitHome;
         return defaultExitHome(c);
     }
+	
+	if(!defaultBoardUsed) {
+	    return c->defaultUpdateDirection(c);
+	}
 
     if(!defaultBoardUsed) {
         return c->defaultUpdateDirection(c);
@@ -361,12 +365,12 @@ static Direction defaultGhostMovement(Character *c) {
     }
     Direction ranDir = random() % 4;
     Coordinates coords;
-	int canGoBack = FALSE;
+	tU8 canMoveBack = FALSE;
     do {
         ranDir = (ranDir + 1) % 4;
-        if (c->currentDirection == turnBack(ranDir) && !canGoBack) {
+        if (c->currentDirection == turnBack(ranDir) && !canMoveBack) {
             ranDir++;
-			canGoBack = TRUE;
+			canMoveBack = TRUE;
         }
         coords = calculateMove(c->position, ranDir);
     } while (!canMove(coords, c->type));

@@ -43,6 +43,38 @@ void initDAC(void) {
 /*****************************************************************************
  *
  * Description:
+ *    Writes to timer registers, reseting the counters and starting the timer.
+ *    The timer is set to stop after the delay passed as the argument.
+ *
+ * Params:
+ *      [in] delay - time in microseconds after which the timer will stop
+ *
+ ****************************************************************************/
+void setTimer(int delay) {
+  T1TCR = 0x02;          // sets the 2nd bit of TimerControlRegister to 1 resets the Timer and the Prescale Counter
+  T1PR  = 0x00;          // writes 0 to the Prescale Register - we don't need scaling
+  T1MR0 = (long) (delay * (long long) CORE_FREQ / 1000) / 1000;  // sets the Match Register to a value we expect after 90us
+  T1IR  = 0xff;          // resets all bits in the Interrupt Register, probably unnecessary, but I didn't get to test it
+  T1MCR = 0x04;          // sets the 3rd bit of MatchControlRegister - when the TC reaches the value in MR0, the timer
+  	  	  	  	  	  	 // will stop and the 0 bit in TCR will be set to 0
+  T1TCR = 0x01;          	// writes 1 to TCR[0] starting the timer
+}
+
+/*****************************************************************************
+ *
+ * Description:
+ *    Busy-waits for the timer to stop.
+ *
+ ****************************************************************************/
+void waitForTimer(void) {
+	while (T1TCR & 0x01)		// The 1st bit of the TCR will be set to 0 when the timer reaches MR and stops.
+		;
+}
+
+
+/*****************************************************************************
+ *
+ * Description:
  *    Sequentially writes all contents of pacmanBeginningSound array (see file beginning_sound.c
  *    in music directory) into DAC register. Uses timer to delay the writes to match
  *    the sound frequency.
@@ -70,37 +102,4 @@ void playBeginningSound(void) {
 
 		waitForTimer();
 	}
-}
-
-
-/*****************************************************************************
- *
- * Description:
- *    Writes to timer registers, reseting the counters and starting the timer.
- *    The timer is set to stop after the delay passed as the argument.
- *
- * Params:
- *      [in] delay - time in microseconds after which the timer will stop
- *
- ****************************************************************************/
-void setTimer(int delay) {
-  T1TCR = 0x02;          // sets the 2nd bit of TimerControlRegister to 1 resets the Timer and the Prescale Counter
-  T1PR  = 0x00;          // writes 0 to the Prescale Register - we don't need scaling
-  T1MR0 = (long) (delay * (long long) CORE_FREQ / 1000) / 1000;  // sets the Match Register to a value we expect after 90us
-  T1IR  = 0xff;          // resets all bits in the Interrupt Register, probably unnecessary, but I didn't get to test it
-  T1MCR = 0x04;          // sets the 3rd bit of MatchControlRegister - when the TC reaches the value in MR0, the timer
-  	  	  	  	  	  	 // will stop and the 0 bit in TCR will be set to 0
-  T1TCR = 0x01;          	// writes 1 to TCR[0] starting the timer
-}
-
-
-/*****************************************************************************
- *
- * Description:
- *    Busy-waits for the timer to stop.
- *
- ****************************************************************************/
-void waitForTimer(void) {
-	while (T1TCR & 0x01)		// The 1st bit of the TCR will be set to 0 when the timer reaches MR and stops.
-		;
 }
