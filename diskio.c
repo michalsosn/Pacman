@@ -1,6 +1,24 @@
-/*-----------------------------------------------------------------------*/
-/* Low level disk I/O module skeleton for Petit FatFs (C)ChaN, 2009      */
-/*-----------------------------------------------------------------------*/
+/******************************************************************************
+ *
+ * Copyright:
+ *    Copyright (C) 2009, ChaN, all right reserved.
+ *
+ * Annotation:
+ *    This library has been adjusted to the needs of 'Pacman Project'.
+ *
+ * File:
+ *    diskio.c
+ *
+ * Description:
+ *    Contains implementations of low level I/O routines required by pff library.
+ *
+ *****************************************************************************/
+
+
+/************/
+/* Includes */
+/************/
+
 
 #include "diskio.h"
 #include "spi.h"
@@ -8,87 +26,102 @@
 #include "startup/printf_P.h"
 
 
-/*-----------------------------------------------------------------------*/
-/* Initialize Disk Drive                                                 */
-/*-----------------------------------------------------------------------*/
+/***********/
+/* Defines */
+/***********/
 
-DSTATUS disk_initialize (void){
 
-	//DSTATUS stat;
+#define START_BLOCK 0xfe
 
+
+/*************/
+/* Functions */
+/*************/
+
+
+/*****************************************************************************
+ *
+ * Description:
+ *      Initializes SD card
+ *
+ * Returns:
+ *      DSTATUS - STA_NOINIT, if initialization was not successful,
+ *                STA_NOREADY, if drive is not ready
+ *                STA_READY, if initialization was successful
+ ****************************************************************************/
+DSTATUS disk_initialize (){
 	initSpi(); /*init at low speed */
 
-	
-	if( sdInit() < 0 ) {
+	if (sdInit() < 0) {
 		return STA_NOINIT;
 	}
 
-	if( sdState() < 0 ){
+	if (sdState() < 0) {
 		return STA_NOREADY;
 	}
 
 	setSpiSpeed(8);
-	return 0;
+	return STA_READY;
 }
 
 
-
-/*-----------------------------------------------------------------------*/
-/* Read Partial Sector                                                   */
-/*-----------------------------------------------------------------------*/
-
-DRESULT disk_readp (
-	BYTE* dest,			/* Pointer to the destination object */
-	DWORD sector,		/* Sector number (LBA) */
-	WORD sofs,			/* Offset in the sector */
-	WORD count			/* Byte count (bit15:destination) */
-)
-{
+/*****************************************************************************
+ *
+ * Description:
+ *      Reads part of sector with given number.
+ *
+ * Params:
+ *      [out] dest - pointer to the buffer for read data
+ *      [in] sector - number of sector to be read from
+ *      [in] count - number of bytes to be read
+ *
+ * Returns:
+ *      DRESULT - result of operation, RES_OK if it succeeded,
+ *                RES_ERR in case of error
+ ****************************************************************************/
+DRESULT disk_readp (BYTE* dest,	DWORD sector, WORD sofs, WORD count) {
 	DRESULT res;
 
-	//potrzebne by dzia³a³o z ekranem
 	setSpiSpeed(8);
-
 
 	BYTE cardresp = 0;
 	BYTE firstblock = 0;
 	BYTE c = 0;
-	WORD fb_timeout=0xffff;
+	WORD fb_timeout = 0xffff;
 	DWORD i = 0;
 
-	DWORD place = 512*(sector);
-	sdCommand(CMDREAD, (WORD) (place >> 16), (WORD) place);
+	DWORD place = SECTOR_SIZE * sector;
+	sdCommand(CARD_CMD_READ, (WORD) (place >> 16), (WORD) place);
 
 	cardresp = sdResp8b(); /* Card response */
 
 	/* Wait for startblock */
-	do
+	do {
 		firstblock = sdResp8b();
-	while(firstblock == 0xff && fb_timeout--);
+	} while(CARD_BUSY == firstblock && fb_timeout--);
 
-	//printf("firstblock: %x\n", firstblock);
-
-	if(cardresp != 0x00 || firstblock != 0xfe){
+	if(cardresp != CARD_OK_RESP || firstblock != START_BLOCK) {
 		sdResp8bError(firstblock);
 		return RES_ERROR;
 	}
 	SELECT_CARD();
-	//printf("sector=%x, sofs=%x, count=%x\n", sector, sofs, count);
-	for( i = 0; i < sofs; i++ )
+	for(i = 0; i < sofs; i++) {
 		spiSend(0xff); /* Skip leading bytes */
-
-	for(i=0;i < (512 - sofs );i++){
-		c = spiSend(0xff);
-
-		if( i < count )
-			*dest++ = c;
 	}
 
+	for(i = 0; i < (SECTOR_SIZE - sofs ); i++){
+		c = spiSend(0xff);
+
+		if(i < count) {
+			*dest = c;
+			dest++;
+		}
+	}
 
 	/* Checksum (2 byte) - ignore for now */
 	spiSend(0xff);
 	spiSend(0xff);
-UNSELECT_CARD();
+    UNSELECT_CARD();
 	res = RES_OK;
 
 	return res;

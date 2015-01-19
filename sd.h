@@ -1,27 +1,59 @@
+/******************************************************************************
+ *
+ * Annotation:
+ *    This library has been adjusted to the needs of 'Pacman Project'.
+ *
+ * File:
+ *    diskio.h
+ *
+ * Description:
+ *    Contains API for communicating with SD card.
+ *
+ *****************************************************************************/
+
+
 #ifndef _SD_H
 #define _SD_H
 
+
+/************/
+/* Includes */
+/************/
+
+
 #include "integer.h"
 
-#define	CMDREAD		17
-#define	CMDWRITE	24
-#define	CMDREADCSD	9
 
-//inicjuj czytnik
+/************/
+/* Defines  */
+/************/
+
+
+#define CARD_CMD_RESET    0
+#define CARD_CMD_INIT     1
+#define CARD_CMD_STATUS   13
+#define	CARD_CMD_READ	  17
+
+#define CARD_BUSY         0xff
+#define CARD_RESET_RESP   1
+#define CARD_OK_RESP      0
+
+
+/*************/
+/* Functions */
+/*************/
+
+
 CHAR sdInit(void);
-//sprawdü system plikÛw
+
 CHAR sdState(void);
-//pozwala na odczyt rejestru z karty i np pobranie wielkoúci karty
-//z mojπ to i tak nie dzia≥a ;)
-//CHAR sdgetDriveSize(void);
-//wyúlij komende
+
 void sdCommand(BYTE cmd, WORD paramx, WORD paramy);
 
-//odpowiedü 8bitowa
 BYTE sdResp8b(void);
-//b≥πd jeúli nastπpi
+
 void sdResp8bError(BYTE value);
-//odpowiedü 16 bitowa
+
 WORD sdResp16b(void);
 
 
