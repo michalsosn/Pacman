@@ -90,7 +90,7 @@ def main():
 
     print('\n};', file=args.out)
 
-    print('// total size: {}'.format(i + 1))
+    print('// total size: {}'.format(i + 1), file=args.out)
 
 
 if __name__ == '__main__':
